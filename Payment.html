@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Confirmation</title>
+
+  <style>
+    /* ===== RESET ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root{
+      --bg-light: #d9d9d9;
+      --bg-mid: #cfcfcf;
+      --bg-dark: #2f3333;
+      --paper: #f7f7f7;
+
+      --pill-black: #111;
+      --pill-yellow: #ffe600;
+
+      --danger: #e50914;
+      --danger-hover: #c3080b;
+
+      --text: #111;
+      --muted: rgba(0,0,0,0.62);
+      --border: 1px solid rgba(0,0,0,0.12);
+      --shadow: 0 10px 26px rgba(0,0,0,0.18);
+
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    html, body{
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body{
+      font-family: Georgia, serif;
+      background: #e6e6e6;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ✅ full screen */
+    .page{
+      width: 100%;
+      min-height: 100vh;
+      background: #e6e6e6;
+    }
+
+    .wrap{
+      width: 94%;
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px 0 28px;
+    }
+
+    /* ===== TOP BAR ===== */
+    .topbar{
+      background: var(--bg-light);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 14px 0;
+      flex-wrap: wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 220px;
+    }
+
+    .brand-logo{
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.18);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .brand-title{
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      font-size: 14px;
+    }
+
+    .nav-actions{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill{
+      border: 2px solid #111;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      line-height: 1;
+      letter-spacing: 0.4px;
+      user-select: none;
+      transition: 0.15s ease;
+      white-space: nowrap;
+      cursor: pointer;
+      color: #111;
+      background: #fff;
+    }
+    .pill:hover{ filter: brightness(.98); transform: translateY(-1px); }
+    .pill.black{ background: var(--pill-black); color: #fff; }
+    .pill.black:hover{ background: #2b2b2b; }
+    .pill.yellow{ background: var(--pill-yellow); color:#111; }
+    .pill.yellow:hover{ filter: brightness(0.95); }
+
+    /* ===== LAYOUT ===== */
+    .grid{
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 16px;
+      margin-top: 16px;
+      align-items: start;
+    }
+
+    .panel{
+      background: var(--paper);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel-head{
+      background: var(--bg-mid);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .panel-head h2{
+      color: #111;
+      font-family: Georgia, serif;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .panel-body{ padding: 14px 16px 16px; }
+
+    .kv{
+      display:flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px dashed rgba(0,0,0,0.16);
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 13px;
+    }
+    .kv:last-child{ border-bottom: none; }
+
+    .kv strong{
+      color: #111;
+      font-weight: 900;
+      letter-spacing: 0.2px;
+    }
+
+    .kv span{
+      color: rgba(0,0,0,0.70);
+      text-align: right;
+      max-width: 60%;
+      word-break: break-word;
+    }
+
+    .notice{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(0,0,0,0.12);
+      background: #fff;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: rgba(0,0,0,0.70);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    /* ===== SUMMARY CARD ===== */
+    .summary{
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+      display: grid;
+      gap: 10px;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .summary-row{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 13px;
+      color: rgba(0,0,0,0.72);
+    }
+
+    .summary-row b{
+      color:#111;
+      font-weight: 900;
+    }
+
+    .total{
+      background: var(--pill-yellow);
+      border: 1px solid rgba(0,0,0,0.18);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display:flex;
+      justify-content: space-between;
+      align-items:center;
+      font-weight: 900;
+      color:#111;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn{
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      transition: 0.18s ease;
+    }
+
+    #payBtn{
+      background: var(--danger);
+      color: white;
+      box-shadow: 0 12px 22px rgba(255, 238, 0, 0.22);
+    }
+    #payBtn:hover{ background: var(--danger-hover); transform: translateY(-1px); }
+
+    #demoPayBtn{
+      background: #111;
+      color: #fff;
+      border: 2px solid #111;
+    }
+    #demoPayBtn:hover{ background: #2b2b2b; transform: translateY(-1px); }
+
+    #payBtn:disabled, #demoPayBtn:disabled{
+      opacity: .7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px){
+      .wrap{
+        width: 95%;
+        padding: 14px 0 22px;
+      }
+
+      .topbar-row{
+        align-items: flex-start;
+      }
+
+      .nav-actions{
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .panel-body{
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 560px){
+      .brand{
+        min-width: unset;
+      }
+
+      .brand-title{
+        font-size: 12px;
+      }
+
+      .pill{
+        width: 100%;
+      }
+
+      .nav-actions{
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .kv{
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .kv span{
+        max-width: 100%;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="wrap">
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="brand-logo">
+            <img src="Teatro logo.png" alt="Teatro Logo">
+          </div>
+          <div class="brand-title">TEATRO LASALLIANA</div>
+        </div>
+
+        <div class="nav-actions">
+          <a class="pill" id="backToReservationBtn" href="#">← PREVIOUS</a>
+          <a class="pill black" href="index.html">HOME</a>
+          <a class="pill yellow" href="index.html#eventsGrid">PREMIERES</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="grid">
+      <!-- LEFT: DETAILS -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Confirm Payment</h2>
+          <span style="font-family:'Segoe UI',Arial,sans-serif;color:rgba(0,0,0,0.60);font-weight:800;font-size:12px;">
+            Review before paying
+          </span>
+        </div>
+
+        <div class="panel-body">
+          <div class="kv">
+            <strong>Event</strong>
+            <span id="eventTitle">Loading...</span>
+          </div>
+          <div class="kv">
+            <strong>Venue</strong>
+            <span id="eventVenue">Loading...</span>
+          </div>
+          <div class="kv">
+            <strong>Showtime</strong>
+            <span id="eventShowtime">Loading...</span>
+          </div>
+
+          <div class="notice">
+            After you click <b>Pay Now</b>, you will be redirected to the payment page.
+            Once successful, your seats will be marked as paid and you’ll receive an email receipt.
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: SUMMARY + ACTIONS -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Summary</h2>
+          <span style="font-family:'Segoe UI',Arial,sans-serif;color:rgba(0,0,0,0.60);font-weight:800;font-size:12px;">
+            Seats & total
+          </span>
+        </div>
+
+        <div class="panel-body">
+          <div class="summary">
+            <div class="summary-row">
+              <span>Seats</span>
+              <b id="selectedSeats">-</b>
+            </div>
+            <div class="summary-row">
+              <span>Price per seat</span>
+              <b id="price">0</b>
+            </div>
+            <div class="total">
+              <span>Total</span>
+              <span id="total">0</span>
+            </div>
+          </div>
+
+          <button class="btn" id="payBtn">Pay Now</button>
+
+          <div class="notice" style="margin-top:12px;">
+            <b>NOTICE:</b> All ticket reservations are non-refundable once paid. Please review your booking details before completing the payment.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EmailJS for email notifications -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script type="module">
+  import "./js/alerts.js"; // Custom alert system
+  import { db, auth } from "./js/firebase-config.js";
+  import { formatTime, showErrorMessage, showLoading } from "./js/utils.js";
+  import { EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, PAYMENT_WORKER_URL, COLLECTIONS } from "./js/constants.js";
+  import { doc, getDoc, collection, addDoc, serverTimestamp, runTransaction, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+
+  const params = new URLSearchParams(window.location.search);
+  const eventId = params.get('event');
+  const showIndex = parseInt(params.get('show'));
+  const seatIds = params.get('seats')?.split(',').filter(s => s.trim());
+
+  // Validate payment parameters
+  if (!eventId || Number.isNaN(showIndex) || !seatIds || seatIds.length === 0) {
+    alert("Invalid payment link. Please select an event, showtime, and seats again.");
+    window.location.href = "index.html";
+    throw new Error("Invalid payment parameters");
+  }
+
+  // Validate showtime index is positive
+  if (showIndex <= 0) {
+    alert("Invalid showtime. Please try again.");
+    window.location.href = "index.html";
+    throw new Error("Invalid showtime index");
+  }
+
+  const backToReservationBtn = document.getElementById("backToReservationBtn");
+  backToReservationBtn.href = `Reservation.html?event=${encodeURIComponent(eventId)}`;
+
+  const eventTitle = document.getElementById('eventTitle');
+  const eventVenue = document.getElementById('eventVenue');
+  const eventShowtime = document.getElementById('eventShowtime');
+  const selectedSeats = document.getElementById('selectedSeats');
+  const priceSpan = document.getElementById('price');
+  const totalSpan = document.getElementById('total');
+  const payBtn = document.getElementById('payBtn');
+
+  let ticketPrice = 0;
+  let currentUser = null;
+  let eventData = null;
+
+  /**
+   * Demo payment function for testing (should be removed in production)
+   */
+  async function demoCompletePayment() {
+    if (!currentUser) {
+      alert("Please log in first.");
+      return;
+    }
+
+    if (!confirm("Demo mode: Mark seats as PAID?")) return;
+
+    const demoBtn = document.getElementById("demoPayBtn");
+    const payBtn = document.getElementById("payBtn");
+
+    demoBtn.disabled = true;
+    demoBtn.textContent = "Processing demo payment...";
+    demoBtn.style.opacity = "0.7";
+    if (payBtn) payBtn.disabled = true;
+
+    try {
+      await finalizePayment("paid");
+
+      await addDoc(collection(db, COLLECTIONS.ORDERS), {
+        userId: currentUser.uid,
+        userEmail: currentUser.email,
+        eventId,
+        showIndex,
+        seats: seatIds,
+        total: seatIds.length * ticketPrice,
+        paymentMethod: "DEMO",
+        status: "paid",
+        createdAt: serverTimestamp()
+      });
+
+      demoBtn.textContent = "Sending email...";
+      try {
+        await sendTeatroEmail();
+        console.log("✅ Email sent!");
+      } catch (e) {
+        console.warn("Email failed:", e);
+      }
+
+      window.location.href = "index.html?payment=success";
+
+    } catch (err) {
+      showErrorMessage(err, "demo payment");
+
+      demoBtn.disabled = false;
+      demoBtn.textContent = "Demo Complete Payment";
+      demoBtn.style.opacity = "1";
+      if (payBtn) payBtn.disabled = false;
+    }
+  }
+
+  /**
+   * Finalizes payment by updating seat status atomically
+   */
+  async function finalizePayment(status) {
+  if (!currentBooking) throw new Error("No active booking found.");
+
+  const showKey = getShowKey(currentBooking.movie, currentBooking.showtimeIndex);
+  const user = auth.currentUser;
+  if (!user) throw new Error("User must be logged in.");
+
+  const results = [];
+
+  for (const seatId of currentBooking.selectedSeats) {
+    const seatRef = doc(db, COLLECTIONS.SHOWS, showKey, "seats", seatId);
+
+    await runTransaction(db, async (transaction) => {
+      const seatDoc = await transaction.get(seatRef);
+
+      if (!seatDoc.exists()) {
+        throw new Error(`Seat ${seatId} does not exist.`);
+      }
+
+      const data = seatDoc.data();
+
+      // Gracefully exit if already finalized by webhook or prior call
+      if (data.reservationStatus === "paid" && data.reservedBy === user.uid) {
+        return;
+      }
+
+      if (data.reservedBy !== user.uid) {
+        throw new Error(`Seat ${seatId} is reserved by another user.`);
+      }
+
+      if (status === "paid") {
+        transaction.update(seatRef, {
+          reservationStatus: "paid",
+          paidAt: serverTimestamp()
+        });
+      } else if (status === "cancel") {
+        transaction.update(seatRef, {
+          reservationStatus: "available",
+          reservedBy: null,
+          reservedAt: null,
+          expiresAt: null
+        });
+      }
+    });
+
+    results.push(seatId);
+  }
+
+  return results;
+}
+
+  async function loadEvent() {
+    try {
+      const snap = await getDoc(doc(db, COLLECTIONS.EVENTS, eventId));
+      if (!snap.exists()) {
+        alert("Event not found!");
+        window.location.href = "index.html";
+        return;
+      }
+
+    eventData = snap.data();
+    ticketPrice = eventData.price || 0;
+
+    eventTitle.textContent = eventData.title;
+    eventVenue.textContent = eventData.venue;
+
+    const showtime = eventData.showtimes[showIndex - 1];
+  if (showtime) {
+    const date = new Date(showtime.date);
+      const formattedDate = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      eventShowtime.textContent = `${formattedDate} ${formatTime(showtime.start)}–${formatTime(showtime.end)}`;
+    } else {
+      eventShowtime.textContent = "Unknown Showtime";
+    }
+
+    selectedSeats.textContent = seatIds.join(', ');
+    priceSpan.textContent = `₱${ticketPrice}`;
+    totalSpan.textContent = `₱${seatIds.length * ticketPrice}`;
+
+      // Security: Validate paid parameter is exactly "1" to prevent manipulation
+      const paid = params.get("paid");
+      if (paid === "1") {
+        try {
+          await finalizePayment("paid");
+        } catch (e) {
+          console.warn("Finalize payment failed:", e);
+          showErrorMessage(e, "payment finalization");
+          window.location.href = "index.html?payment=cancel";
+          return;
+        }
+
+      const key = `email_sent_${eventId}_${showIndex}_${seatIds.join("_")}`;
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        try {
+          await sendTeatroEmail();
+          await new Promise(r => setTimeout(r, 300));
+        } catch (e) {
+          console.warn("Email failed:", e);
+        }
+      }
+        window.location.href = "index.html?payment=success";
+        return;
+      } else if (paid === "0") {
+        window.location.href = "index.html?payment=cancel";
+        return;
+      }
+    } catch (error) {
+      showErrorMessage(error, "loading payment details");
+      window.location.href = "index.html";
+    }
+  }
+
+
+  /**
+   * Sends confirmation email to user
+   */
+  async function sendTeatroEmail() {
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: currentUser.email,
+        user_name: currentUser.displayName || currentUser.email.split('@')[0],
+        event_title: eventData.title,
+        venue: eventData.venue,
+        show_date: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        show_time: eventShowtime.textContent,
+        seats: seatIds.join(', '),
+        total: seatIds.length * ticketPrice
+      });
+      console.log('✅ Email sent!');
+    } catch (error) {
+      console.error('Email failed:', error);
+    }
+  }
+
+  /**
+   * Initiates payment through PayMongo via Cloudflare Worker
+   */
+ /**
+   * Initiates payment through PayMongo via Cloudflare Worker
+   */
+  async function handlePayment() {
+    if (!currentUser) {
+      alert("Please log in first.");
+      return;
+    }
+
+    payBtn.disabled = true;
+    payBtn.textContent = "Processing...";
+
+    // Calculate total order price in centavos
+    const totalAmount = seatIds.length * ticketPrice * 100; 
+    const baseUrl = window.location.origin;
+
+    const successUrl = `${baseUrl}/Payment.html?event=${encodeURIComponent(eventId)}&show=${showIndex}&seats=${encodeURIComponent(seatIds.join(","))}&paid=1`;
+    const cancelUrl  = `${baseUrl}/Payment.html?event=${encodeURIComponent(eventId)}&show=${showIndex}&seats=${encodeURIComponent(seatIds.join(","))}&paid=0`;
+
+    try {
+      // Send data to Cloudflare Worker endpoint
+      const workerEndpoint = PAYMENT_WORKER_URL.endsWith('/') 
+        ? `${PAYMENT_WORKER_URL}create-checkout` 
+        : `${PAYMENT_WORKER_URL}/create-checkout`;
+
+      const response = await fetch(workerEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: totalAmount,
+          eventId,
+          showIndex,
+          seatIds,
+          email: currentUser.email,
+          successUrl,
+          cancelUrl
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || data.errors?.[0]?.detail || "Payment initialization failed");
+      }
+
+      if (!data.checkout_url) {
+        throw new Error("No checkout URL returned from server.");
+      }
+
+      // Redirect to PayMongo Hosted Checkout
+      window.location.href = data.checkout_url;
+
+    } catch (error) {
+      console.error("Payment Error:", error);
+      showErrorMessage(error, "payment initialization");
+      
+      // Re-enable button instead of redirecting
+      payBtn.disabled = false;
+      payBtn.textContent = "Pay Now";
+    }
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+      loadEvent();
+    } else {
+      window.location.href = "Login.html";
+    }
+  });
+
+  payBtn.addEventListener('click', handlePayment);
+
+  document
+    .getElementById("demoPayBtn")
+</script>
+
+</body>
+</html>

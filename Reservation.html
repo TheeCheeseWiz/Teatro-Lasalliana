@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seat Reservation</title>
+
+  <style>
+    /* ===== RESET ===== */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root{
+      --bg-light: #d9d9d9;
+      --bg-mid: #cfcfcf;
+      --bg-dark: #2f3333;
+      --card: #f7f7f7;
+
+      --pill-black: #111;
+      --pill-yellow: #ffe600;
+
+      --text: #111;
+      --muted: rgba(0,0,0,0.62);
+
+      --danger: #e50914;
+      --danger-hover: #c3080b;
+
+      --shadow: 0 10px 26px rgba(0,0,0,0.18);
+      --border: 1px solid rgba(0,0,0,0.10);
+      --radius: 16px;
+      --radius-sm: 12px;
+    }
+
+    html, body{
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body{
+      font-family: Georgia, serif;
+      background: #e6e6e6;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ✅ full screen */
+    .page{
+      width: 100%;
+      min-height: 100vh;
+      background: #e6e6e6;
+    }
+
+    .wrap{
+      width: 94%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 0 28px;
+    }
+
+    /* ===== TOP BAR ===== */
+    .topbar{
+      background: var(--bg-light);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+      padding: 14px 0;
+      flex-wrap: wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 220px;
+    }
+
+    .brand-logo{
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.18);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+    }
+    .brand-logo img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+
+    .brand-title{
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      font-size: 14px;
+    }
+
+    .nav-actions{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill{
+      border: 2px solid #111;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 800;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      line-height: 1;
+      letter-spacing: 0.4px;
+      user-select: none;
+      transition: 0.15s ease;
+      white-space: nowrap;
+      cursor: pointer;
+      color: #111;
+      background: #fff;
+    }
+    .pill:hover{ filter: brightness(.98); transform: translateY(-1px); }
+    .pill.black{ background: var(--pill-black); color: #fff; }
+    .pill.black:hover{ background: #2b2b2b; }
+    .pill.yellow{ background: var(--pill-yellow); color:#111; }
+    .pill.yellow:hover{ filter: brightness(0.95); }
+
+    /* ===== HEADER CARD ===== */
+    .header{
+      padding: 20px 0 6px;
+    }
+
+    .header-card{
+      background: var(--bg-light);
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+      overflow: hidden;
+    }
+
+    .header-inner{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 16px;
+      padding: 18px 18px 16px;
+      flex-wrap: wrap;
+    }
+
+    .titles h1{
+      font-size: clamp(22px, 2.2vw, 32px);
+      color: #111;
+      margin-bottom: 4px;
+      letter-spacing: 0.2px;
+    }
+
+    .titles h2{
+      font-size: 14px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .summary{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-left: auto;
+    }
+
+    .chip{
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 999px;
+      padding: 10px 12px;
+      min-width: 160px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    }
+
+    .chip b{ font-size: 14px; color: #111; }
+
+    .chip.total{
+      background: var(--pill-yellow);
+      border-color: rgba(0,0,0,0.20);
+      font-weight: 900;
+    }
+
+    /* ===== MAIN GRID ===== */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      padding: 16px 0 4px;
+    }
+
+    .panel{
+      background: #f4f4f4;
+      border: var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.10);
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .panel-head{
+      background: var(--bg-mid);
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .panel-head h3{
+      font-size: 14px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #111;
+    }
+
+    .panel-body{
+      padding: 14px 16px 16px;
+    }
+
+    /* ===== SHOWTIMES ===== */
+    #showtimesContainer{
+      display:flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .showtime-group{
+      text-align: left;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.10);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+    }
+
+    .showtime-group::before{
+      content: "Select a showtime";
+      display:block;
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-weight: 800;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    .showtime-btn{
+      border: 2px solid #111;
+      background: #fff;
+      color: #111;
+      border-radius: 999px;
+      padding: 10px 14px;
+      margin: 6px 6px 0 0;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+      white-space: normal;
+      line-height: 1.4;
+    }
+    .showtime-btn:hover{
+      background: var(--pill-yellow);
+      transform: translateY(-1px);
+    }
+    .showtime-btn.active{
+      background: var(--pill-yellow);
+      color: #111;
+    }
+    .showtime-btn:disabled{
+      background: #dcdcdc !important;
+      color: #777 !important;
+      border-color: #aaa !important;
+      cursor: not-allowed !important;
+      pointer-events: none;
+      transform: none !important;
+      box-shadow: none;
+      opacity: 0.9;
+    }
+    .showtime-btn:disabled:hover{
+      background: #dcdcdc !important;
+      transform: none !important;
+    }
+    .showtime-status{
+      display: inline-block;
+      margin-left: 8px;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .showtime-status.low{ color: #c3080b; }
+    .showtime-status.full{ color: #777; }
+
+    /* ===== STAGE + THEATER ===== */
+    .stage-wrap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 14px 0 10px;
+    }
+
+    .stage{
+      background: #bfbfbf;
+      border: 1px solid rgba(0,0,0,0.18);
+      height: 42px;
+      width: min(420px, 70%);
+      border-radius: 40px 40px 0 0;
+      text-align: center;
+      line-height: 42px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #111;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.12);
+    }
+
+    .theater{
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      gap: 12px;
+      padding: 4px 0 8px;
+      overflow-x: auto;
+    }
+
+    .side-stairs{
+      width: 22px;
+      min-height: calc((25px + 10px) * 5);
+      background: repeating-linear-gradient(to bottom,#ddd,#ddd 10px,#bbb 10px,#bbb 20px);
+      border-radius: 6px;
+      border: 1px solid rgba(0,0,0,0.10);
+      flex: 0 0 auto;
+    }
+
+    .seating{
+      display:flex;
+      flex-direction: column;
+      align-items:center;
+      padding: 10px 10px 6px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.10);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.08);
+      flex: 0 0 auto;
+    }
+
+    .row{ display:flex; justify-content:center; margin: 5px 0; }
+
+    .seat{
+      background: #444451;
+      height: 28px;
+      width: 28px;
+      margin: 3px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.18s ease;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      font-size: 10px;
+      color: #fff;
+      font-weight: 900;
+      font-family: "Segoe UI", Arial, sans-serif;
+      border: 1px solid rgba(0,0,0,0.18);
+      user-select: none;
+    }
+
+    .seat:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+    }
+
+    .seat.selected{
+      background: var(--pill-yellow);
+      color: #111;
+    }
+
+    .seat.occupied{
+      background: #ff4d4d;
+      cursor: not-allowed;
+      opacity: 0.95;
+    }
+
+    .back-stairs{
+      width: 100%;
+      height: 25px;
+      background: repeating-linear-gradient(to right,#ddd,#ddd 10px,#bbb 10px,#bbb 20px);
+      border-radius: 6px;
+      margin-top: 10px;
+      border: 1px solid rgba(0,0,0,0.10);
+    }
+
+    /* ===== LEGEND ===== */
+    .legend{
+      display:flex;
+      justify-content:center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .legend .item{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.10);
+      border-radius: 999px;
+      padding: 8px 10px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+    }
+    .legend .seat{
+      margin: 0;
+      height: 18px;
+      width: 18px;
+      border-radius: 6px;
+      font-size: 0;
+      cursor: default;
+    }
+    .legend .seat:hover{ transform:none; filter:none; }
+
+    /* ===== RESERVE BUTTON ===== */
+    #reserveBtn{
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: var(--danger);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      font-family: "Segoe UI", Arial, sans-serif;
+      box-shadow: 0 12px 22px rgba(229,9,20,0.22);
+      transition: 0.18s ease;
+    }
+    #reserveBtn:hover{ background: var(--danger-hover); transform: translateY(-1px); }
+    #reserveBtn:disabled{
+      background: #bdbdbd;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .summary{ width: 100%; justify-content: flex-start; }
+    }
+
+    @media (max-width: 768px){
+      .wrap{
+        width: 95%;
+        padding: 14px 0 22px;
+      }
+
+      .topbar-row{
+        align-items: flex-start;
+      }
+
+      .nav-actions{
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .header-inner{
+        padding: 16px 14px;
+      }
+
+      .panel-body{
+        padding: 12px;
+      }
+
+      .chip{
+        min-width: 130px;
+      }
+
+      .theater{
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 560px){
+      .brand{
+        min-width: unset;
+      }
+
+      .brand-title{
+        font-size: 12px;
+      }
+
+      .pill{
+        width: 100%;
+      }
+
+      .nav-actions{
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .stage{
+        width: 95%;
+      }
+
+      .seat{
+        height: 26px;
+        width: 26px;
+        font-size: 9px;
+        margin: 2px;
+      }
+
+      .showtime-btn{
+        width: 100%;
+        text-align: center;
+        margin-right: 0;
+      }
+
+      .summary{
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .chip{
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="page">
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="wrap">
+      <div class="topbar-row">
+        <div class="brand">
+          <div class="brand-logo">
+            <img src="Teatro logo.png" alt="Teatro Logo">
+          </div>
+          <div class="brand-title">TEATRO LASALLIANA</div>
+        </div>
+
+        <div class="nav-actions">
+          <a class="pill" id="backToPlayBtn" href="#">← PREVIOUS</a>
+          <a class="pill black" href="index.html">HOME</a>
+          <a class="pill yellow" href="index.html#eventsGrid">PREMIERES</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- HEADER -->
+    <section class="header">
+      <div class="header-card">
+        <div class="header-inner">
+          <div class="titles">
+            <h1 id="eventTitle">Seat Reservation</h1>
+            <h2 id="eventVenue"></h2>
+          </div>
+
+          <div class="summary">
+            <div class="chip">
+              <span>Seats</span>
+              <b><span id="count">0</span></b>
+            </div>
+            <div class="chip total">
+              <span>Total</span>
+              <b>₱<span id="total">0</span></b>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN -->
+    <section class="grid">
+      <!-- LEFT: SEATING -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Seat Map</h3>
+          <span style="font-family:'Segoe UI',Arial,sans-serif;color:rgba(0,0,0,0.55);font-weight:700;font-size:12px;">
+            Tap seats to select
+          </span>
+        </div>
+
+        <div class="panel-body">
+          <div class="stage-wrap">
+            <div class="stage">Stage</div>
+          </div>
+
+          <div class="theater">
+            <div class="side-stairs"></div>
+            <div class="seating" id="seating"></div>
+            <div class="side-stairs"></div>
+          </div>
+
+          <div class="legend">
+            <div class="item"><div class="seat"></div><span>Available</span></div>
+            <div class="item"><div class="seat selected"></div><span>Selected</span></div>
+            <div class="item"><div class="seat occupied"></div><span>Occupied</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: SHOWTIMES + ACTION -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Showtimes</h3>
+          <span style="font-family:'Segoe UI',Arial,sans-serif;color:rgba(0,0,0,0.55);font-weight:700;font-size:12px;">
+            Choose a schedule first
+          </span>
+        </div>
+
+        <div class="panel-body">
+          <div id="showtimesContainer"></div>
+          <button id="reserveBtn" disabled>Reserve Selected Seats</button>
+
+          <div style="margin-top:10px; font-family:'Segoe UI',Arial,sans-serif; color:rgba(0,0,0,0.62); font-size:12px; line-height:1.5;">
+            <strong style="color:#111;">Note:</strong> Red seats are already taken.
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script type="module">
+  import "./js/alerts.js"; // Custom alert system
+  import { db, auth } from "./js/firebase-config.js";
+  import { formatTime, formatDate, showErrorMessage, showLoading } from "./js/utils.js";
+  import { RESERVATION_TIMEOUT_MS, COLLECTIONS } from "./js/constants.js";
+  import { collection, doc, getDoc, getDocs, onSnapshot, runTransaction, serverTimestamp, Timestamp, writeBatch, query, where }
+    from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  let selectedShowLabel = "";
+
+  let currentUser = null;
+  let eventId = new URLSearchParams(window.location.search).get("event");
+  let selectedShowIndex = null;
+  let ticketPrice = 0;
+
+  const seatingDiv = document.getElementById("seating");
+  const countSpan = document.getElementById("count");
+  const totalSpan = document.getElementById("total");
+  const reserveBtn = document.getElementById("reserveBtn");
+  const showtimesContainer = document.getElementById("showtimesContainer");
+  const eventTitle = document.getElementById("eventTitle");
+  const eventVenue = document.getElementById("eventVenue");
+  const backToPlayBtn = document.getElementById("backToPlayBtn");
+
+  if (eventId) {
+    backToPlayBtn.href = `Play.html?event=${encodeURIComponent(eventId)}`;
+  } else {
+    backToPlayBtn.href = "index.html#eventsGrid";
+  }
+
+  let selectedSeats = new Set();
+  let unsubscribeSeats = null;
+
+  async function loadEvent() {
+    try {
+      showLoading(seatingDiv, "Loading event...");
+      const snap = await getDoc(doc(db, COLLECTIONS.EVENTS, eventId));
+      if (!snap.exists()) {
+        alert("⚠️ Event not found.");
+        window.location.href = "index.html";
+        return;
+      }
+
+    const data = snap.data();
+    eventTitle.textContent = data.title;
+    eventVenue.textContent = data.venue;
+      ticketPrice = data.price || 0;
+
+      await renderShowtimeButtons(data.showtimes || []);
+    } catch (error) {
+      showErrorMessage(error, "loading event");
+      window.location.href = "index.html";
+    }
+  }
+
+  /**
+   * Gets seat availability for a show, checking for expired reservations
+   */
+  async function getShowAvailability(showIndex) {
+    const showKey = `${eventId}_show${showIndex + 1}`;
+
+    try {
+      await expireOldReservations(showKey);
+    } catch (e) {
+      console.warn("Could not refresh expired reservations for", showKey, e);
+    }
+
+    const seatsCol = collection(db, COLLECTIONS.SHOWS, showKey, "seats");
+    const snap = await getDocs(seatsCol);
+
+    let total = 0;
+    let available = 0;
+
+    snap.forEach((docSnap) => {
+      total++;
+      const seat = docSnap.data();
+      const isExpiredReserved =
+        seat.reservationStatus === "reserved" &&
+        seat.expiresAt?.toMillis?.() &&
+        seat.expiresAt.toMillis() <= Date.now();
+
+      if (!seat.taken || isExpiredReserved) {
+        available++;
+      }
+    });
+
+    return {
+      total,
+      available,
+      full: total > 0 && available === 0
+    };
+  }
+
+  async function renderShowtimeButtons(showtimes) {
+  showtimesContainer.innerHTML = "";
+  const grouped = {};
+
+  showtimes.forEach((s, index) => {
+    if (!grouped[s.date]) grouped[s.date] = [];
+    grouped[s.date].push({ ...s, index });
+  });
+
+  for (const date of Object.keys(grouped)) {
+    const groupDiv = document.createElement("div");
+    groupDiv.classList.add("showtime-group");
+
+    // Fetch availability for all showtimes under this date concurrently
+    const availabilityList = await Promise.all(
+      grouped[date].map((st) => getShowAvailability(st.index))
+    );
+
+    grouped[date].forEach((st, idx) => {
+      const btn = document.createElement("button");
+      btn.classList.add("showtime-btn");
+
+      const startTime = formatTime(st.start);
+      const endTime = formatTime(st.end);
+      const dateObj = new Date(st.date + "T00:00");
+      const formattedDate = dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+      btn.dataset.showIndex = String(st.index);
+      btn.dataset.label = `${formattedDate} — ${startTime}–${endTime}`;
+
+      const availability = availabilityList[idx];
+
+      let statusHtml = "";
+      if (availability.full) {
+        statusHtml = `<span class="showtime-status full">Sold Out</span>`;
+        btn.disabled = true;
+        btn.setAttribute("disabled", "disabled");
+        btn.setAttribute("aria-disabled", "true");
+      } else if (availability.available <= 10) {
+        statusHtml = `<span class="showtime-status low">${availability.available} seats left</span>`;
+      }
+
+      btn.innerHTML = `${btn.dataset.label}${statusHtml ? ` ${statusHtml}` : ""}`;
+
+      if (!availability.full) {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".showtime-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          selectedShowIndex = st.index;
+          selectedShowLabel = btn.dataset.label;
+          loadSeats(selectedShowIndex);
+        });
+      }
+
+      groupDiv.appendChild(btn);
+    });
+
+    showtimesContainer.appendChild(groupDiv);
+  }
+}
+
+  /**
+   * Loads seats for a show with real-time updates
+   */
+ function loadSeats(showIndex) {
+    if (unsubscribeSeats) unsubscribeSeats();
+    
+    // Clear selected state immediately on showtime switch
+    selectedSeats.clear();
+    updateSelectedCount();
+
+    const showKey = `${eventId}_show${showIndex + 1}`;
+    const seatsCol = collection(db, COLLECTIONS.SHOWS, showKey, "seats");
+    
+    showLoading(seatingDiv, "Loading seats...");
+
+    unsubscribeSeats = onSnapshot(seatsCol, (snapshot) => {
+      seatingDiv.innerHTML = "";
+      const grouped = {};
+      let totalSeats = 0;
+      let availableSeats = 0;
+
+      snapshot.forEach(docSnap => {
+        const id = docSnap.id;
+        const data = docSnap.data();
+        const isExpiredReserved =
+          data.reservationStatus === "reserved" &&
+          data.expiresAt?.toMillis?.() &&
+          data.expiresAt.toMillis() <= Date.now();
+
+        totalSeats++;
+        if (!data.taken || isExpiredReserved) {
+          availableSeats++;
+        }
+
+        const rowLetter = id[0];
+        if (!grouped[rowLetter]) grouped[rowLetter] = [];
+        grouped[rowLetter].push({ id, ...data });
+      });
+
+      Object.keys(grouped).sort().forEach(row => {
+        const rowDiv = document.createElement("div");
+        rowDiv.classList.add("row");
+        grouped[row].sort((a,b)=>parseInt(a.id.slice(1))-parseInt(b.id.slice(1))).forEach(seat=>{
+          const seatDiv=document.createElement("div");
+          seatDiv.classList.add("seat");
+          seatDiv.textContent=seat.id;
+
+          // Re-apply "selected" class if seat is in selectedSeats Set
+          if (selectedSeats.has(seat.id)) {
+            seatDiv.classList.add("selected");
+          }
+
+          if (seat.taken) {
+            seatDiv.classList.add("occupied");
+          } else {
+            seatDiv.addEventListener("click", () => {
+              if (seatDiv.classList.contains("selected")) {
+                seatDiv.classList.remove("selected");
+                selectedSeats.delete(seat.id);
+              } else {
+                seatDiv.classList.add("selected");
+                selectedSeats.add(seat.id);
+              }
+              updateSelectedCount();
+            });
+          }
+
+          rowDiv.appendChild(seatDiv);
+        });
+        seatingDiv.appendChild(rowDiv);
+      });
+
+      const showBtn = document.querySelector(`.showtime-btn[data-show-index="${showIndex}"]`);
+      if (showBtn) {
+        let statusHtml = "";
+
+        if (totalSeats > 0 && availableSeats === 0) {
+          statusHtml = `<span class="showtime-status full">Sold Out</span>`;
+          showBtn.disabled = true;
+          showBtn.setAttribute("disabled", "disabled");
+          showBtn.setAttribute("aria-disabled", "true");
+          showBtn.classList.remove("active");
+
+          if (selectedShowIndex === showIndex) {
+            selectedShowIndex = null;
+            selectedShowLabel = "";
+            selectedSeats.clear();
+            updateSelectedCount();
+          }
+        } else if (availableSeats <= 10) {
+          statusHtml = `<span class="showtime-status low">${availableSeats} seats left</span>`;
+          showBtn.disabled = false;
+          showBtn.removeAttribute("disabled");
+          showBtn.removeAttribute("aria-disabled");
+        } else {
+          showBtn.disabled = false;
+          showBtn.removeAttribute("disabled");
+          showBtn.removeAttribute("aria-disabled");
+        }
+
+        showBtn.innerHTML = `${showBtn.dataset.label}${statusHtml ? ` ${statusHtml}` : ""}`;
+      }
+
+      const backStairs=document.createElement("div");
+      backStairs.classList.add("back-stairs");
+      seatingDiv.appendChild(backStairs);
+    });
+  }
+
+  function updateSelectedCount() {
+    countSpan.textContent = selectedSeats.size;
+    totalSpan.textContent = selectedSeats.size * ticketPrice;
+    reserveBtn.disabled = !(selectedSeats.size > 0 && currentUser && selectedShowIndex !== null);
+  }
+
+  /**
+   * Reserves selected seats with atomic transaction (all or nothing)
+   * This prevents race conditions and overlapping bookings
+   */
+  async function reserveSeats() {
+    if (!currentUser) {
+      alert("Please log in first.");
+      return;
+    }
+    if (selectedShowIndex === null) {
+      alert("Please select a showtime first.");
+      return;
+    }
+    if (selectedSeats.size === 0) {
+      alert("Please select at least one seat.");
+      return;
+    }
+
+    const showKey = `${eventId}_show${selectedShowIndex + 1}`;
+    const seatIds = [...selectedSeats];
+
+    // Disable button to prevent double-click
+    reserveBtn.disabled = true;
+    reserveBtn.textContent = "Reserving...";
+
+    try {
+      await expireOldReservations(showKey);
+    } catch (e) {
+      console.warn("Expire cleanup skipped:", e);
+    }
+
+    const nowMs = Date.now();
+    const expiresAt = Timestamp.fromMillis(nowMs + RESERVATION_TIMEOUT_MS);
+
+    // Retry logic for transaction conflicts
+    const maxRetries = 3;
+    let attempt = 0;
+    let lastError = null;
+
+    while (attempt < maxRetries) {
+      attempt++;
+      
+      try {
+        // ✅ CRITICAL FIX: Reserve ALL seats in ONE atomic transaction
+        await runTransaction(db, async (tx) => {
+          const seatRefs = seatIds.map(seatId => 
+            doc(db, COLLECTIONS.SHOWS, showKey, "seats", seatId)
+          );
+
+          // Step 1: Read ALL seats first (required by Firestore transactions)
+          const seatSnapshots = await Promise.all(
+            seatRefs.map(ref => tx.get(ref))
+          );
+
+          // Step 2: Validate ALL seats BEFORE updating ANY
+          const seatsData = [];
+          for (let i = 0; i < seatSnapshots.length; i++) {
+            const snap = seatSnapshots[i];
+            const seatId = seatIds[i];
+
+            if (!snap.exists()) {
+              throw new Error(`Seat ${seatId} not found.`);
+            }
+
+            const data = snap.data();
+            seatsData.push(data);
+
+            // Check if seat is permanently taken (paid)
+            if (data.reservationStatus === "paid") {
+              throw new Error(`Seat ${seatId} is already paid and occupied.`);
+            }
+
+            // Check if seat is currently reserved by someone else
+            if (data.reservationStatus === "reserved" && 
+                data.expiresAt?.toMillis?.() > Date.now() && 
+                data.reservedBy && 
+                data.reservedBy !== currentUser.uid) {
+              throw new Error(`Seat ${seatId} is currently reserved by another user. Please select different seats.`);
+            }
+
+            // Check if seat is taken but expired (should be freed by expireOldReservations)
+            if (data.taken && 
+                data.reservationStatus !== "reserved" && 
+                data.reservationStatus !== "paid") {
+              throw new Error(`Seat ${seatId} is in an invalid state. Please refresh and try again.`);
+            }
+          }
+
+          // Step 3: ALL seats are available - now update ALL seats atomically
+          for (let i = 0; i < seatRefs.length; i++) {
+            const seatRef = seatRefs[i];
+            const seatId = seatIds[i];
+
+            tx.update(seatRef, {
+              taken: true,
+              reservationStatus: "reserved",
+              reservedBy: currentUser.uid,
+              reservedAt: serverTimestamp(),
+              expiresAt: expiresAt
+            });
+
+            // Create transaction log for each seat
+            const tRef = doc(collection(db, COLLECTIONS.TRANSACTIONS));
+            tx.set(tRef, {
+              userId: currentUser.uid,
+              userEmail: currentUser.email || null,
+              eventId,
+              showKey,
+              seatId,
+              action: "reserved",
+              createdAt: serverTimestamp(),
+              meta: { note: "Seat reserved (unpaid hold)" }
+            });
+          }
+
+          // If we reach here, ALL seats will be reserved atomically
+        });
+
+        // Success! Redirect to payment
+        const seatsStr = seatIds.join(",");
+        window.location.href = `Payment.html?event=${eventId}&show=${selectedShowIndex + 1}&seats=${seatsStr}`;
+        return; // Exit retry loop
+
+      } catch (err) {
+        lastError = err;
+        
+        // Check if this is a transaction conflict (retry-able error)
+        const isConflict = err.message?.includes("aborted") || 
+                          err.message?.includes("contention") ||
+                          err.code === "aborted";
+
+        if (isConflict && attempt < maxRetries) {
+          // Wait before retry with exponential backoff
+          const backoffMs = Math.min(1000 * Math.pow(2, attempt - 1), 3000);
+          console.log(`Transaction conflict detected. Retrying in ${backoffMs}ms... (Attempt ${attempt}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, backoffMs));
+          continue; // Retry
+        }
+
+        // Non-retry-able error or max retries reached
+        break;
+      }
+    }
+
+    // If we get here, all retries failed
+    console.error("Reservation failed after retries:", lastError);
+    
+    // Show user-friendly error message
+    let errorMsg = "Could not reserve seats. ";
+    if (lastError.message?.includes("reserved by another user")) {
+      errorMsg += "One or more seats were just taken by another user. Please select different seats.";
+    } else if (lastError.message?.includes("already paid")) {
+      errorMsg += "One or more seats have already been purchased. Please refresh the page.";
+    } else if (attempt >= maxRetries) {
+      errorMsg += "The system is busy. Please try again in a moment.";
+    } else {
+      errorMsg += lastError.message || "Unknown error occurred.";
+    }
+    
+    alert("⚠️ " + errorMsg);
+    showErrorMessage(lastError, "seat reservation");
+    
+    // Re-enable button
+    reserveBtn.disabled = false;
+    reserveBtn.textContent = "Reserve Selected Seats";
+    
+    // Refresh seats to show current state
+    if (selectedShowIndex !== null) {
+      loadSeats(selectedShowIndex);
+    }
+  }
+
+  /**
+   * Expires old reservations that have passed their timeout
+   */
+  async function expireOldReservations(showKey) {
+    const qy = query(
+      collection(db, COLLECTIONS.SHOWS, showKey, "seats"),
+      where("reservationStatus", "==", "reserved")
+    );
+    const snap = await getDocs(qy);
+    if (snap.empty) return;
+
+    const batch = writeBatch(db);
+    snap.forEach((d) => {
+      const data = d.data();
+      const exp = data.expiresAt?.toMillis?.();
+      if (exp && exp <= Date.now()) {
+        batch.update(d.ref, {
+          taken: false,
+          reservationStatus: "expired",
+          reservedBy: null,
+          reservedAt: null,
+          expiresAt: null
+        });
+        const tRef = doc(collection(db, COLLECTIONS.TRANSACTIONS));
+        batch.set(tRef, {
+          userId: data.reservedBy || null,
+          userEmail: null,
+          eventId,
+          showKey,
+          seatId: d.id,
+          action: "expired",
+          createdAt: Timestamp.now(),
+          meta: { note: "Auto-expired unpaid reservation" }
+        });
+      }
+    });
+    await batch.commit();
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      currentUser = user;
+      loadEvent();
+    } else {
+      alert("Please log in to reserve seats.");
+      window.location.href = "Login.html";
+    }
+  });
+
+  reserveBtn.addEventListener("click", reserveSeats);
+
+  // Resets state when returning to the page from browser back button
+  window.addEventListener("pageshow", (event) => {
+    selectedSeats.clear();
+    updateSelectedCount();
+    document.querySelectorAll(".seat.selected").forEach((seat) => {
+      seat.classList.remove("selected");
+    });
+  });
+  
+</script>
+
+</body>
+</html>

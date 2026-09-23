@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Play Description</title>
+
+  <style>
+    *{ box-sizing:border-box; margin:0; padding:0; }
+    html, body { height: 100%; }
+
+    body{
+      background:#d9d9d9;
+      font-family: Georgia, serif;
+      color:#111;
+    }
+
+    /* ✅ Full screen layout (no 1-inch frame) */
+    .page{
+      min-height: 100vh;
+      width: 100%;
+      margin: 0;
+      border: 0;
+      box-shadow: none;
+      background:#d9d9d9;
+    }
+
+    .wrap{
+      width:92%;
+      max-width:1100px;
+      margin: 0 auto;
+    }
+
+    /* Top bar */
+    .topbar{
+      background:#e5e5e5;
+      border-bottom:1px solid rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .topbar-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 0;
+      gap:16px;
+      flex-wrap: wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:220px;
+    }
+    .brand a{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      text-decoration:none;
+      color:inherit;
+    }
+    .brand img{
+      width:42px;
+      height:42px;
+      object-fit:contain;
+      display:block;
+    }
+
+    .nav{
+      display:flex;
+      gap:22px;
+      align-items:center;
+      flex-wrap:wrap;
+      flex:1;
+      justify-content:flex-end;
+    }
+    .nav a{
+      font-family: "Segoe UI", Arial, sans-serif;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.4px;
+      text-decoration:none;
+      color:#111;
+      opacity:.85;
+      cursor:pointer;
+    }
+    .nav a:hover{ text-decoration:underline; opacity:1; }
+
+    /* Hero */
+    .hero{
+      background:#222;
+      height: clamp(240px, 34vh, 420px); /* ✅ adapts to screen */
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-img{
+      position:absolute;
+      inset:0;
+      background-position:center;
+      background-size:cover;
+      filter:saturate(1.05);
+      transform: scale(1.02);
+    }
+    .hero-overlay{
+      position:absolute;
+      inset:0;
+      background: linear-gradient(90deg, rgba(0,0,0,.15), rgba(0,0,0,.60));
+    }
+
+    /* Info strip */
+    .info-strip{
+      background:#e5e5e5;
+      border-top:1px solid rgba(0,0,0,0.08);
+      border-bottom:1px solid rgba(0,0,0,0.08);
+      padding:18px 0;
+    }
+    .info-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .info-left{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      min-width:220px;
+    }
+    .play-title{
+      font-size:22px;
+      font-weight:700;
+    }
+    .play-sub{
+      font-family:"Segoe UI", Arial, sans-serif;
+      font-size:12px;
+      color:rgba(0,0,0,.65);
+    }
+
+    .meta{
+      display:flex;
+      gap:36px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+    }
+    .meta-block small{
+      display:block;
+      font-family:"Segoe UI", Arial, sans-serif;
+      font-size:12px;
+      color:rgba(0,0,0,.55);
+      margin-bottom:4px;
+    }
+    .meta-block strong{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .btn{
+      border:2px solid #111;
+      border-radius:999px;
+      padding:10px 16px;
+      font-family:"Segoe UI", Arial, sans-serif;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.3px;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:40px;
+      cursor:pointer;
+      transition:.15s ease;
+      background:#ffe600;
+      color:#111;
+      white-space:nowrap;
+    }
+    .btn:hover{ filter:brightness(.95); }
+
+    /* Tabs area */
+    .panel{
+      background:#2f3333;
+      color:#fff;
+      padding:18px 0 34px;
+      min-height: calc(100vh - 64px - 260px - 86px); /* ✅ fills remaining space */
+    }
+
+    .tabs{
+      display:flex;
+      justify-content:center;
+      gap:18px;
+      font-family:"Segoe UI", Arial, sans-serif;
+      font-size:12px;
+      opacity:.95;
+      flex-wrap: wrap;
+    }
+    .tabs button{
+      background:transparent;
+      border:none;
+      color:#fff;
+      font-weight:800;
+      cursor:pointer;
+      padding:10px 14px;
+      border-bottom:2px solid transparent;
+      letter-spacing:.3px;
+    }
+    .tabs button.active{
+      border-bottom:2px solid #ffe600;
+    }
+    .divider{
+      height:1px;
+      background: rgba(255,255,255,0.18);
+      margin:12px 0 18px;
+    }
+
+    .content-box{
+      font-family:"Segoe UI", Arial, sans-serif;
+      font-size:13px;
+      line-height:1.6;
+      opacity:.95;
+      padding: 0 2px;
+    }
+    .content-box h3{
+      font-family: Georgia, serif;
+      font-size:16px;
+      margin-bottom:10px;
+    }
+
+    .showtimes{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:8px;
+    }
+    .showtime{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius:12px;
+      padding:10px 12px;
+      flex-wrap: wrap;
+    }
+    .showtime .left{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .showtime .left strong{
+      font-size:13px;
+      font-weight:900;
+    }
+    .showtime .left small{
+      font-size:12px;
+      opacity:.8;
+    }
+    .muted{ opacity:.75; }
+
+    /* Premiere grid inside tab */
+    .prem-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 10px;
+    }
+    .prem-card{
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.06);
+      border-radius: 14px;
+      overflow:hidden;
+      cursor:pointer;
+      transition:.15s ease;
+      text-decoration:none;
+      color:#fff;
+      display:block;
+    }
+    .prem-card:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,0.08);
+    }
+    .prem-img{
+      height: 140px;
+      background-size: cover;
+      background-position: center;
+    }
+    .prem-body{
+      padding: 10px 12px 12px;
+    }
+    .prem-body strong{
+      display:block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      font-weight: 900;
+    }
+    .prem-body small{
+      display:block;
+      opacity:.8;
+      font-size: 12px;
+    }
+
+    @media (max-width:720px){
+      .meta{ gap:18px; }
+      .showtime{ flex-direction:column; align-items:flex-start; }
+      .nav{ justify-content:flex-start; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="page">
+
+  <header class="topbar">
+    <div class="wrap">
+      <div class="topbar-row">
+        <div class="brand">
+          <a href="index.html" aria-label="Teatro Home">
+            <img src="Teatro logo.png" alt="Teatro Lasalliana">
+          </a>
+        </div>
+
+        <nav class="nav">
+          <a href="index.html">HOME</a>
+          <a href="index.html#eventsGrid">PREMIERES</a>
+          <a href="index.html#eventsGrid" id="teatroLink">TEATRO</a>
+          <a href="About.html">ABOUT US</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-img" id="heroImg"></div>
+    <div class="hero-overlay"></div>
+  </section>
+
+  <section class="info-strip">
+    <div class="wrap">
+      <div class="info-row">
+        <div class="info-left">
+          <div class="play-title" id="playTitle">Loading…</div>
+          <div class="play-sub" id="playSub">—</div>
+        </div>
+
+        <div class="meta">
+          <div class="meta-block">
+            <small>Duration</small>
+            <strong id="durationText">—</strong>
+          </div>
+          <div class="meta-block">
+            <small>Age</small>
+            <strong id="ageText">—</strong>
+          </div>
+          <div class="meta-block">
+            <small>Price</small>
+            <strong id="priceText">—</strong>
+          </div>
+        </div>
+
+        <a class="btn" id="buyBtn" href="#">Buy a Ticket</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="wrap">
+      <div class="tabs">
+        <button id="tabDesc" class="active" type="button">Description</button>
+        <button id="tabShows" type="button">Showtime & Performance</button>
+        <button id="tabPrem" type="button">Premieres</button>
+      </div>
+      <div class="divider"></div>
+
+      <div class="content-box" id="panelContent">Loading…</div>
+    </div>
+  </section>
+
+</div>
+
+<script type="module">
+  import "./js/alerts.js"; // Custom alert system
+  import { db, auth } from "./js/firebase-config.js";
+  import { formatTime, formatDate, escapeHtml, showErrorMessage, showLoading } from "./js/utils.js";
+  import { COLLECTIONS } from "./js/constants.js";
+  import { doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+  const heroImg = document.getElementById("heroImg");
+  const playTitle = document.getElementById("playTitle");
+  const playSub = document.getElementById("playSub");
+  const durationText = document.getElementById("durationText");
+  const ageText = document.getElementById("ageText");
+  const priceText = document.getElementById("priceText");
+  const buyBtn = document.getElementById("buyBtn");
+
+  const tabDesc = document.getElementById("tabDesc");
+  const tabShows = document.getElementById("tabShows");
+  const tabPrem = document.getElementById("tabPrem");
+  const panelContent = document.getElementById("panelContent");
+
+  const url = new URLSearchParams(window.location.search);
+  const eventId = url.get("event");
+
+  if (!eventId) {
+    playTitle.textContent = "No event selected.";
+    panelContent.textContent = "Go back to the homepage and select a premiere.";
+    buyBtn.href = "index.html#eventsGrid";
+    buyBtn.textContent = "Back to Premieres";
+  } else {
+    buyBtn.href = `Reservation.html?event=${encodeURIComponent(eventId)}`;
+    loadEvent(eventId);
+  }
+
+  function setActiveTab(activeBtn){
+    [tabDesc, tabShows, tabPrem].forEach(b => b.classList.remove("active"));
+    activeBtn.classList.add("active");
+  }
+
+  async function loadEvent(id) {
+    try {
+      showLoading(document.getElementById("description"), "Loading event details...");
+      const snap = await getDoc(doc(db, COLLECTIONS.EVENTS, id));
+      if (!snap.exists()) {
+        alert("Event not found!");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const data = snap.data();
+
+      playTitle.textContent = escapeHtml(data.title || "Play Title");
+      playSub.textContent = data.venue ? `${data.venue}` : "Teatro Lasalliana";
+      
+      durationText.textContent = data.duration ? `${data.duration} mins` : "—";
+      ageText.textContent = data.ageRating ? data.ageRating : "—";
+      priceText.textContent = data.price ? `₱${data.price}` : "—";
+
+      const poster = data.imageUrl || "https://via.placeholder.com/1400x500";
+      heroImg.style.backgroundImage = `url('${poster}')`;
+
+      let descHTML = "<p>No description available.</p>";
+      if (data.description) {
+        descHTML = `<p style="white-space:pre-wrap;">${escapeHtml(data.description)}</p>`;
+      }
+
+      descHTML += `<p><strong>Duration:</strong> ${escapeHtml(String(data.duration))} minutes</p>`;
+      descHTML += `<p><strong>Age Rating:</strong> ${escapeHtml(data.ageRating)}</p>`;
+      descHTML += `<p><strong>Price:</strong> ${escapeHtml(data.price)}</p>`;
+
+      setActiveTab(tabDesc);
+      panelContent.innerHTML = `<h3>Description</h3>${descHTML}`;
+
+      tabDesc.onclick = () => {
+        setActiveTab(tabDesc);
+        panelContent.innerHTML = `<h3>Description</h3>${descHTML}`;
+      };
+
+      tabShows.onclick = () => {
+        setActiveTab(tabShows);
+        const st = Array.isArray(data.showtimes) ? data.showtimes : [];
+        if (!st.length){
+          panelContent.innerHTML = `<h3>Showtime & Performance</h3><p class="muted">No showtimes available.</p>`;
+          return;
+        }
+
+        const html = st.map((s, idx) => `
+          <div class="showtime">
+            <div class="left">
+              <strong>Show ${idx+1}: ${formatDate(s.date)}</strong>
+              <small>${formatTime(s.start)} – ${formatTime(s.end)} • ${data.venue || "Venue"}</small>
+            </div>
+          </div>
+        `).join("");
+
+        panelContent.innerHTML = `
+          <h3>Showtime & Performance</h3>
+          <div class="showtimes">${html}</div>
+        `;
+      };
+
+      tabPrem.onclick = async () => {
+        setActiveTab(tabPrem);
+        panelContent.innerHTML = `<h3>Premieres</h3><p class="muted">Loading premieres…</p>`;
+
+        try{
+          const eventsSnap = await getDocs(collection(db, COLLECTIONS.EVENTS));
+          if (eventsSnap.empty){
+            panelContent.innerHTML = `<h3>Premieres</h3><p class="muted">No premieres available.</p>`;
+            return;
+          }
+
+          let cards = "";
+          eventsSnap.forEach(ds => {
+            const ev = ds.data();
+            const img = ev.imageUrl || "https://via.placeholder.com/600x400";
+            const title = ev.title || "Untitled";
+            const venue = ev.venue || "Teatro Lasalliana";
+            cards += `
+              <a class="prem-card" href="Play.html?event=${encodeURIComponent(ds.id)}">
+                <div class="prem-img" style="background-image:url('${img}')"></div>
+                <div class="prem-body">
+                  <strong>${escapeHtml(title)}</strong>
+                  <small>${escapeHtml(venue)}</small>
+                </div>
+              </a>
+            `;
+          });
+
+          panelContent.innerHTML = `
+            <h3>Premieres</h3>
+            <p class="muted">Click a play to open its details page.</p>
+            <div class="prem-grid">${cards}</div>
+            <div style="margin-top:12px;">
+              <a class="btn" href="index.html#eventsGrid">Back to Home Premieres</a>
+            </div>
+          `;
+        }catch(e){
+          console.error(e);
+          panelContent.innerHTML = `<h3>Premieres</h3><p class="muted">Failed to load premieres.</p>`;
+        }
+      };
+
+    }catch(err){
+      console.error(err);
+      playTitle.textContent = "Error loading play.";
+      panelContent.textContent = "Failed to load data. Please try again.";
+    }
+  }
+
+
+</script>
+
+</body>
+</html>

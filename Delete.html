@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delete Events</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body{
+      font-family: Georgia, serif;
+      display: flex;
+      min-height: 100vh;
+      background: #dcdcdc;
+      color: #111;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar{
+      width: 260px;
+      background: #f4e21b;
+      min-height: 100vh;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar-header{
+      text-align: center;
+      font-weight: bold;
+      color: #000;
+      margin-bottom: 25px;
+      line-height: 1.1;
+    }
+
+    .sidebar-header .icon{
+      font-size: 26px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-header .title{
+      font-size: 22px;
+    }
+
+    .sidebar-header .sub{
+      font-size: 18px;
+    }
+
+    .nav{
+      margin-top: 10px;
+    }
+
+    .sidebar a{
+      display: block;
+      background: #111;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      text-align: center;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .sidebar a:hover{
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    .sidebar-footer{
+      text-align: center;
+      font-size: 12px;
+      color: #111;
+      opacity: 0.9;
+    }
+
+    /* ===== CONTENT ===== */
+    .content{
+      flex: 1;
+      padding: 40px;
+      overflow-x: auto;
+    }
+
+    .page-title{
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #111;
+    }
+
+    .page-subtitle{
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+      margin-bottom: 24px;
+    }
+
+    .table-card{
+      background: #efefef;
+      border-radius: 14px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    .table-wrap{
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    thead{
+      background: #111;
+      color: #fff;
+    }
+
+    th, td{
+      padding: 14px 16px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      font-size: 14px;
+    }
+
+    th{
+      font-size: 13px;
+      letter-spacing: 0.3px;
+    }
+
+    tbody tr{
+      background: #f8f8f8;
+      transition: 0.15s ease;
+    }
+
+    tbody tr:hover{
+      background: #f0f0f0;
+    }
+
+    .play-cell{
+      min-width: 220px;
+    }
+
+    .play-title{
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .play-venue{
+      color: rgba(0,0,0,0.65);
+      font-size: 12px;
+    }
+
+    .desc-cell{
+      max-width: 280px;
+      color: rgba(0,0,0,0.8);
+      line-height: 1.5;
+    }
+
+    .muted{
+      color: rgba(0,0,0,0.55);
+      font-size: 12px;
+    }
+
+    .stat{
+      font-weight: bold;
+    }
+
+    .profit{
+      color: #0b5d1e;
+      font-weight: bold;
+    }
+
+    .actions{
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .trash-btn{
+      background: #111;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.2s ease;
+    }
+
+    .trash-btn:hover{
+      background: #c3080b;
+      transform: scale(1.04);
+    }
+
+    .empty-state{
+      padding: 24px;
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+    }
+
+    @media (max-width: 768px){
+      body{ flex-direction: column; }
+
+      .sidebar{
+        width: 100%;
+        min-height: auto;
+      }
+
+      .content{
+        padding: 18px;
+      }
+
+      .page-title{
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <div>
+      <div class="sidebar-header">
+        <span class="icon">🎭</span>
+        <div class="title">Admin</div>
+        <div class="sub">Dashboard</div>
+      </div>
+
+      <div class="nav">
+        <a href="Admin.html">Dashboard</a>
+        <a href="Create.html">Event Editor</a>
+        <a href="Delete.html">Delete</a>
+        <a href="History.html">History</a>
+        <a href="Transaction.html">Transactions</a>
+        <a href="index.html">Go to Site</a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      Follow TEATRO Lasalliana<br>
+      📷 Instagram • 👍 Facebook
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">Delete Events</div>
+    <div class="page-subtitle">Delete an event and archive it to history.</div>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Play</th>
+              <th>Description</th>
+              <th>First Show Date</th>
+              <th>Taken Seats</th>
+              <th>Profit</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="eventsTableBody">
+            <tr>
+              <td colspan="6" class="empty-state">Loading events...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } 
+      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, getDocs, collection, updateDoc, deleteDoc, setDoc, serverTimestamp}
+      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFunctions, httpsCallable } 
+      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-functions.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCA212oYhwdJjb4aLMCWOIJXb2xRwzQylc",
+      authDomain: "teatrocapstone.firebaseapp.com",
+      projectId: "teatrocapstone",
+      storageBucket: "teatrocapstone.appspot.com",
+      messagingSenderId: "434560617971",
+      appId: "1:434560617971:web:47a8f9c132d014f4429686",
+      measurementId: "G-W6221CLGNG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const eventsTableBody = document.getElementById("eventsTableBody");
+
+    // ✅ Check admin
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = "Login.html";
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists() || snap.data().role !== "admin") {
+        alert("🚫 Access denied.");
+        window.location.href = "index.html";
+      } else {
+        loadEventsTable();
+      }
+    });
+
+    // 🔄 Reset seats (kept, same logic)
+    async function resetSeats(eventId) {
+      const eventSnap = await getDoc(doc(db, "events", eventId));
+      if (!eventSnap.exists()) return;
+
+      const data = eventSnap.data();
+      const dates = data.showtimes || [];
+
+      for (let i = 0; i < dates.length; i++) {
+        const showKey = `${eventId}_show${i+1}`;
+        const seatsCol = collection(db, "shows", showKey, "seats");
+        const snapshot = await getDocs(seatsCol);
+
+        const updates = [];
+        snapshot.forEach(seatDoc => {
+          updates.push(updateDoc(seatDoc.ref, {
+            taken: false,
+            reservedBy: null,
+            reservedAt: null
+          }));
+        });
+        await Promise.all(updates);
+      }
+
+      alert(`✅ Seats reset for ${eventId}`);
+    }
+
+    // ✅ Load events into table with description/date/profit/taken seats
+    async function loadEventsTable() {
+      eventsTableBody.innerHTML = `<tr><td colspan="6" class="empty-state">Loading events...</td></tr>`;
+
+      try {
+        const snapshot = await getDocs(collection(db, "events"));
+
+        if (snapshot.empty) {
+          eventsTableBody.innerHTML = `<tr><td colspan="6" class="empty-state">No events found.</td></tr>`;
+          return;
+        }
+
+        let rows = "";
+
+        for (const docSnap of snapshot.docs) {
+          const data = docSnap.data();
+          const eventId = docSnap.id;
+          const firstShow = data.showtimes?.[0]?.date || "No show date";
+          const description = data.description || "No description";
+          const venue = data.venue || "No venue";
+
+          let totalTaken = 0;
+          let totalProfit = 0;
+
+          const showtimes = data.showtimes || [];
+
+          for (let i = 0; i < showtimes.length; i++) {
+            const showKey = `${eventId}_show${i + 1}`;
+            const seatsSnap = await getDocs(collection(db, "shows", showKey, "seats"));
+
+            seatsSnap.forEach(seatDoc => {
+              const seatData = seatDoc.data();
+              if (seatData.taken) {
+                totalTaken++;
+                totalProfit += (data.price || 0);
+              }
+            });
+          }
+
+          rows += `
+            <tr>
+              <td class="play-cell">
+                <div class="play-title">${escapeHtml(data.title || "Untitled")}</div>
+                <div class="play-venue">${escapeHtml(venue)}</div>
+              </td>
+              <td class="desc-cell">${escapeHtml(description)}</td>
+              <td>${escapeHtml(firstShow)}</td>
+              <td><span class="stat">${totalTaken}</span></td>
+              <td><span class="profit">₱${totalProfit}</span></td>
+              <td class="actions">
+                <button class="trash-btn" data-id="${eventId}" title="Delete Event">🗑</button>
+              </td>
+            </tr>
+          `;
+        }
+
+        eventsTableBody.innerHTML = rows;
+
+        document.querySelectorAll(".trash-btn").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const eventId = btn.getAttribute("data-id");
+            if (eventId) deleteEvent(eventId);
+          });
+        });
+
+      } catch (err) {
+        console.error("loadEventsTable error:", err);
+        eventsTableBody.innerHTML = `<tr><td colspan="6" class="empty-state">Failed to load events.</td></tr>`;
+      }
+    }
+
+    // 🗑 Delete event (with history archive + stats) — SAME LOGIC
+    async function deleteEvent(eventId) {
+      if (!confirm("⚠️ Delete this event? It will be archived in /history.")) return;
+
+      try {
+        const eventRef = doc(db, "events", eventId);
+        const eventSnap = await getDoc(eventRef);
+        if (!eventSnap.exists()) {
+          alert("❌ Event not found.");
+          return;
+        }
+        const eventData = eventSnap.data();
+
+        let totalSeats = 0;
+        let takenSeats = 0;
+
+        const dates = eventData.showtimes || [];
+
+        // copy shows + seats and count stats
+        for (let i = 0; i < dates.length; i++) {
+          const showKey = `${eventId}_show${i + 1}`;
+          const showRef = doc(db, "shows", showKey);
+          const showSnap = await getDoc(showRef);
+
+          // copy show doc into history
+          if (showSnap.exists()) {
+            await setDoc(doc(db, "history", eventId, "shows", showKey), showSnap.data());
+          }
+
+          // copy seats and count stats
+          const seatsCol = collection(db, "shows", showKey, "seats");
+          const seatsSnap = await getDocs(seatsCol);
+
+          if (!seatsSnap.empty) {
+            const copyPromises = seatsSnap.docs.map(sd => {
+              const seatData = sd.data();
+              totalSeats++;
+              if (seatData.taken) takenSeats++;
+
+              return setDoc(doc(db, "history", eventId, "shows", showKey, "seats", sd.id), seatData);
+            });
+            await Promise.all(copyPromises);
+
+            // now delete the live seats
+            const deletePromises = seatsSnap.docs.map(sd => deleteDoc(sd.ref));
+            await Promise.all(deletePromises);
+          }
+
+          // delete show doc
+          if (showSnap.exists()) {
+            await deleteDoc(showRef);
+          }
+        }
+
+        // calculate profit AFTER counting
+        const profit = takenSeats * (eventData.price || 0);
+
+        // finally archive event into history (with stats)
+        const historyRef = doc(db, "history", eventId);
+        await setDoc(historyRef, {
+          ...eventData,
+          originalEventId: eventId,
+          totalSeats,
+          takenSeats,
+          profit,
+          deletedAt: serverTimestamp(),
+          deletedBy: auth.currentUser?.uid || null,
+          deletedByEmail: auth.currentUser?.email || null
+        });
+
+        // delete the event from active collection
+        await deleteDoc(eventRef);
+
+        alert(`✅ Event archived with stats (Seats: ${takenSeats}/${totalSeats}, Profit: ₱${profit})`);
+        loadEventsTable();
+      } catch (err) {
+        console.error("deleteEvent -> ERROR", err);
+        alert("⚠️ Delete failed: " + err.message);
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+
+</body>
+</html>

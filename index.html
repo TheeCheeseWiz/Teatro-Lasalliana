@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Teatro Lasalliana</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* ================= GENERAL ================= */
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Poppins',sans-serif; background:#f5f5f5; color:#111; }
+  h1,h2,h3 { font-family:'Playfair Display',serif; }
+  a { text-decoration:none; color:inherit; }
+
+  :root{
+    --light:#eaeaea;
+    --dark:#2f3333;
+    --black:#111;
+    --yellow:#ffe600;
+    --muted: rgba(0,0,0,0.65);
+  }
+
+  /* ================= NAVBAR ================= */
+  .navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px 60px;
+    background:var(--light);
+    border-bottom:1px solid rgba(0,0,0,0.10);
+    gap:20px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .nav-left{
+    display:flex;
+    align-items:center;
+    gap:22px;
+    flex-wrap:wrap;
+  }
+
+  .logo-wrap{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-right:6px;
+  }
+  .logo-wrap img{
+    width:44px;
+    height:44px;
+    object-fit:contain; /* transparent PNG ok */
+    display:block;
+  }
+
+  .nav-links{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+    font-weight:600;
+    letter-spacing:.4px;
+    font-size:13px;
+  }
+  .nav-links a{
+    opacity:.9;
+  }
+  .nav-links a:hover{
+    opacity:1;
+    text-decoration:underline;
+  }
+
+  .nav-right{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    flex-wrap:wrap;
+  }
+
+  .btn-yellow, .btn-dark{
+    padding:8px 20px;
+    border-radius:25px;
+    font-weight:700;
+    border:2px solid var(--black);
+    font-size:12px;
+    letter-spacing:.3px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:40px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:.15s ease;
+  }
+  .btn-yellow{ background:var(--yellow); color:var(--black); }
+  .btn-yellow:hover{ filter:brightness(.95); }
+  .btn-dark{ background:var(--black); color:#fff; }
+  .btn-dark:hover{ background:#2b2b2b; }
+
+  /* ================= HERO ================= */
+  .hero{
+    height:80vh;
+    min-height:460px;
+    background:url("https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=2000&q=60") center/cover no-repeat;
+    display:flex;
+    align-items:flex-end;
+    padding:0 80px 60px;
+    color:#fff;
+    position:relative;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    background:rgba(0,0,0,0.38);
+  }
+  .hero-content{ position:relative; z-index:1; }
+  .hero h1{ font-size:64px; line-height:1; letter-spacing:.4px; }
+
+  /* ================= HERO INFO STRIP ================= */
+  .hero-info{
+    background:var(--light);
+    padding:18px 80px;
+    display:flex;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    border-top:1px solid rgba(0,0,0,0.10);
+  }
+  .hero-info small{ color: rgba(0,0,0,0.55); display:block; margin-bottom:4px; }
+  .hero-info h3{ font-size:22px; }
+  .hero-info a{
+    margin-left:auto;
+    align-self:flex-end;
+    color:#111;
+    text-decoration:underline;
+    opacity:.85;
+    font-family:'Playfair Display',serif;
+  }
+  .hero-info a:hover{ opacity:1; }
+
+  /* ================= PREMIERES ================= */
+  .section-dark{
+    background:var(--dark);
+    padding:60px 80px;
+    color:#fff;
+  }
+  .section-dark h2{ font-size:40px; font-weight:400; opacity:.95; }
+
+  .cards{
+    margin-top:34px;
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+    align-items:stretch;
+  }
+
+  /* Make whole card clickable */
+  .card-link{
+    display:block;
+    width:250px;
+  }
+
+  .card{
+    width:100%;
+    background:#444;
+    border-radius:10px;
+    overflow:hidden;
+    transition:0.25s;
+    cursor:pointer;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+  .card:hover{ transform:scale(1.04); }
+
+  .card img{
+    width:100%;
+    height:350px;
+    object-fit:cover;
+    display:block;
+  }
+  .card-content{
+    padding:14px 14px 16px;
+  }
+  .card-content h3{ font-size:18px; margin-bottom:6px; }
+  .card-content p{ font-size:13px; opacity:.85; }
+
+  .pill-top{
+    position:absolute;
+    top:12px;
+    left:12px;
+    background: rgba(0,0,0,0.65);
+    color:#fff;
+    padding:7px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    font-family:'Poppins',sans-serif;
+  }
+  .pill-age{
+    position:absolute;
+    top:12px;
+    right:12px;
+    background: var(--yellow);
+    color:#111;
+    padding:7px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+    font-family:'Poppins',sans-serif;
+    border:1px solid rgba(0,0,0,0.35);
+  }
+  .card-media{
+    position:relative;
+  }
+
+  /* ================= BUTTON SECTION ================= */
+  .button-section{
+    background:var(--light);
+    padding:40px;
+    text-align:center;
+  }
+  .big-btn{
+    display:inline-block;
+    margin:10px;
+    padding:12px 35px;
+    border-radius:30px;
+    font-weight:700;
+    border:2px solid var(--black);
+    font-size:13px;
+    letter-spacing:.2px;
+    transition:.15s ease;
+  }
+  .big-btn.yellow{ background:var(--yellow); }
+  .big-btn.dark{ background:var(--black); color:#fff; }
+  .big-btn:hover{ filter:brightness(.96); transform: translateY(-1px); }
+
+  /* ================= REGISTER SECTION ================= */
+  .register{
+    height:70vh;
+    min-height:420px;
+    background:url("https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=2000&q=60") center/cover no-repeat;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    color:#fff;
+    position:relative;
+  }
+  .register::after{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.50);
+  }
+  .register-content{
+    position:relative;
+    z-index:1;
+    max-width:760px;
+    padding: 0 18px;
+  }
+  .register h2{
+    font-size:46px;
+    margin-bottom:14px;
+    font-weight:400;
+  }
+  .register p{ margin-bottom:18px; opacity:.95; }
+  .register button{
+    padding:12px 34px;
+    background:var(--yellow);
+    border:2px solid var(--black);
+    border-radius:30px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.15s ease;
+  }
+  .register button:hover{ filter:brightness(.95); transform: translateY(-1px); }
+
+  /* ================= FOOTER ================= */
+  footer{
+    background:var(--black);
+    color:#fff;
+    padding:24px 60px;
+  }
+
+  .footer-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+
+  .footer-left h3{
+    font-weight:400;
+    margin-bottom:6px;
+  }
+
+  .footer-left p{
+    font-size:13px;
+    opacity:.8;
+  }
+
+  .footer-socials{
+    display:flex;
+    gap:12px;
+    align-items:center;
+  }
+
+  .social-icon{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:.2s ease;
+    border:2px solid transparent;
+  }
+
+  .social-icon:hover{
+    transform:translateY(-2px);
+    border-color:var(--yellow);
+  }
+
+  .social-icon img{
+    width:24px;
+    height:24px;
+    object-fit:contain;
+    display:block;
+  }
+
+
+  /* ================= RESPONSIVE ================= */
+  @media (max-width: 860px){
+    .navbar{ padding: 14px 18px; }
+    .hero{ padding: 0 18px 44px; }
+    .hero h1{ font-size: 44px; }
+    .hero-info{ padding: 16px 18px; }
+    .section-dark{ padding: 46px 18px; }
+    footer{ padding: 18px; }
+    .card-link{ width: 100%; max-width: 360px; }
+    .card img{ height: 320px; }
+  }
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<div class="navbar">
+  <div class="nav-left">
+    <a class="logo-wrap" href="index.html" aria-label="Teatro Lasalliana Home">
+      <img src="Teatro logo.png" alt="Teatro Lasalliana Logo">
+    </a>
+
+    <div class="nav-links">
+      <a href="index.html">HOME</a>
+      <a href="#eventsSection">PREMIERES</a>
+      <a href="Teatro.html">TEATRO</a>
+      <a href="About.html">ABOUT US</a>
+
+    </div>
+  </div>
+
+  <div class="nav-right">
+    <!-- keep IDs for logic -->
+    <a class="btn-yellow" href="Admin.html" id="adminLink" style="display:none;">ADMIN</a>
+
+    <!-- Signup + Login buttons (we keep your logic: they can be hidden when user logs in) -->
+    <a class="btn-yellow" href="Login.html" id="authLink">SIGN UP</a>
+    <a class="btn-dark" href="Login.html" id="loginLink">LOG IN</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-content">
+    <h1>TEATRO Lasalliana</h1>
+  </div>
+</div>
+
+<!-- HERO INFO -->
+<div class="hero-info">
+  <div>
+    <small>Time & Date</small>
+    <h3 id="timeDateText">—</h3>
+  </div>
+
+  <div>
+    <small>2025-2026</small>
+    <h3 id="perfText">—</h3>
+  </div>
+
+  <a href="#eventsSection">Find out more...</a>
+</div>
+
+<!-- PREMIERES -->
+<div class="section-dark" id="eventsSection">
+  <h2>Upcoming Premieres</h2>
+
+  <div class="cards" id="eventsGrid">
+    <!-- Firebase events load here -->
+  </div>
+</div>
+
+<!-- BUTTON SECTION -->
+<div class="button-section">
+
+</div>
+
+<!-- REGISTER -->
+<div class="register">
+  <div class="register-content">
+    <h2>Experience the Magic of Theatre First!</h2>
+    <p>
+      Be the first to experience the magic of live theater!
+      Register now and get early access to tickets, presales,
+      and exclusive updates.
+    </p>
+    <button type="button" onclick="registerAlert()">Register Now</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-row">
+    <div class="footer-left">
+      <h3>TEATRO Lasalliana</h3>
+      <p>Follow us on our official social media pages.</p>
+    </div>
+
+    <div class="footer-socials">
+      <a
+        class="social-icon"
+        href="https://www.instagram.com/1988teatro?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Instagram"
+      >
+        <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram">
+      </a>
+
+      <a
+        class="social-icon"
+        href="https://www.facebook.com/TEATROLasalliana1988"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Facebook"
+      >
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function registerAlert(){
+    alert("Registration page coming soon!");
+  }
+</script>
+
+<!-- Firebase + Auth + Events Logic -->
+<script type="module">
+  import "./js/alerts.js"; // Custom alert system
+  import { db, auth } from "./js/firebase-config.js";
+  import { formatTime, formatDate, escapeHtml, showErrorMessage, showLoading } from "./js/utils.js";
+  import { COLLECTIONS, ROLES, TRANSACTIONS_PER_PAGE } from "./js/constants.js";
+  import { collection, doc, getDoc, onSnapshot, getDocs, query, where, orderBy, limit }
+    from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  const authLink = document.getElementById("authLink");     // SIGN UP (becomes Logout)
+  const loginLink = document.getElementById("loginLink");   // LOG IN (hidden when logged in)
+  const adminLink = document.getElementById("adminLink");   // right ADMIN button
+  const adminTextLink = document.getElementById("adminTextLink"); // nav ADMIN text
+
+  const eventsGrid = document.getElementById("eventsGrid");
+  const timeDateText = document.getElementById("timeDateText");
+  const perfText = document.getElementById("perfText");
+
+  // Handle payment status from URL
+  const params = new URLSearchParams(window.location.search);
+  const paymentStatus = params.get("payment");
+  if (paymentStatus === "success") {
+    alert("🎉 Payment successful! Your seats are reserved.");
+    history.replaceState({}, "", "index.html");
+  } else if (paymentStatus === "cancel") {
+    alert("❌ Payment cancelled. No charges were made.");
+    history.replaceState({}, "", "index.html");
+  }
+
+  // Auth state management
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      try {
+        const snap = await getDoc(doc(db, COLLECTIONS.USERS, user.uid));
+        const isAdmin = snap.exists() && snap.data().role === ROLES.ADMIN;
+
+      adminLink.style.display = isAdmin ? "inline-flex" : "none";
+      if (adminTextLink) adminTextLink.style.display = isAdmin ? "inline-flex" : "none";
+
+      authLink.textContent = `LOGOUT (${user.email})`;
+      authLink.href = "#";
+      authLink.onclick = (e) => {
+        e.preventDefault();
+        signOut(auth).then(() => window.location.href = "index.html");
+      };
+
+        if (loginLink) loginLink.style.display = "none";
+      } catch (error) {
+        console.error("Error loading user data:", error);
+      }
+    } else {
+      authLink.textContent = "SIGN UP";
+      authLink.href = "Login.html";
+      adminLink.style.display = "none";
+      if (adminTextLink) adminTextLink.style.display = "none";
+      if (loginLink) loginLink.style.display = "inline-flex";
+    }
+  });
+
+  /**
+   * Loads events with real-time updates
+   */
+  function loadEventsRealtime() {
+    const eventsCol = collection(db, COLLECTIONS.EVENTS);
+    showLoading(eventsGrid, "Loading events...");
+
+    onSnapshot(eventsCol, (snapshot) => {
+      eventsGrid.innerHTML = "";
+
+      if (snapshot.empty) {
+        eventsGrid.innerHTML = `<div style="opacity:.9;text-align:center;padding:40px;">No events available at the moment.</div>`;
+        if (timeDateText) timeDateText.textContent = "—";
+        if (perfText) perfText.textContent = "0 Performances";
+        return;
+      }
+
+      // UI count
+      if (perfText) perfText.textContent = `${snapshot.size} Performance${snapshot.size > 1 ? "s" : ""}`;
+
+      let firstDateText = null;
+
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+
+        const firstShow = data.showtimes?.[0];
+        const dateLabel = firstShow?.date ? firstShow.date : null;
+        const showLabel = firstShow?.date && firstShow?.start
+          ? `${formatDate(firstShow.date)}, ${formatTime(firstShow.start)}`
+          : "Upcoming";
+
+        if (!firstDateText && dateLabel) firstDateText = formatDate(dateLabel);
+
+        // ✅ Whole card clickable -> Play.html
+        // Play page reads: ?event=<docSnap.id>
+        const a = document.createElement("a");
+        a.className = "card-link";
+        a.href = `Play.html?event=${encodeURIComponent(docSnap.id)}`;
+        a.setAttribute("aria-label", `Open ${data.title || "Play"} details`);
+
+        const poster = escapeHtml(data.imageUrl || "https://via.placeholder.com/600x900");
+        const title = escapeHtml(data.title || "Play Title");
+        const venue = escapeHtml(data.venue || "Description");
+        const age = escapeHtml(data.ageRating || "14+");
+
+        a.innerHTML = `
+          <div class="card">
+            <div class="card-media">
+              <img src="${poster}" alt="${title}">
+              <div class="pill-top">${showLabel}</div>
+              <div class="pill-age">${age}</div>
+            </div>
+            <div class="card-content">
+              <h3>${title}</h3>
+              <p>${venue}</p>
+            </div>
+          </div>
+        `;
+
+        eventsGrid.appendChild(a);
+      });
+
+      if (timeDateText) timeDateText.textContent = firstDateText ? firstDateText : "—";
+
+    }, (err) => {
+      showErrorMessage(err, "loading events");
+      eventsGrid.innerHTML = `<div style="opacity:.9;text-align:center;padding:40px;">Failed to load events. Please refresh the page.</div>`;
+    });
+  }
+
+
+  loadEventsRealtime();
+
+
+// Transactions UI
+const txModal = document.getElementById("txModal");
+const myTxBtn = document.getElementById("myTxBtn");
+const txCloseBtn = document.getElementById("txCloseBtn");
+const txTbody = document.getElementById("txTbody");
+const txStatus = document.getElementById("txStatus");
+
+function openTxModal() {
+  txModal.style.display = "flex";
+}
+function closeTxModal() {
+  txModal.style.display = "none";
+}
+txCloseBtn?.addEventListener("click", closeTxModal);
+txModal?.addEventListener("click", (e) => { if (e.target === txModal) closeTxModal(); });
+
+/**
+ * Loads user's transaction history
+ */
+async function loadMyTransactions(uid) {
+  txStatus.textContent = "Loading…";
+  txTbody.innerHTML = "";
+
+  try {
+    const qy = query(
+      collection(db, COLLECTIONS.TRANSACTIONS),
+      where("userId", "==", uid),
+      orderBy("createdAt", "desc"),
+      limit(TRANSACTIONS_PER_PAGE)
+    );
+
+    const snap = await getDocs(qy);
+    if (snap.empty) {
+      txStatus.textContent = "No transactions yet.";
+      return;
+    }
+    txStatus.textContent = `Showing ${snap.size} latest transactions`;
+
+    snap.forEach((d) => {
+      const t = d.data();
+      const tr = document.createElement("tr");
+      tr.style.borderBottom = "1px solid #f0f0f0";
+
+      const date = t.createdAt?.toDate?.() ? t.createdAt.toDate().toLocaleString() : "";
+      const action = escapeHtml((t.action || "").toUpperCase());
+      const eventId = escapeHtml(t.eventId || "");
+      const showKey = escapeHtml(t.showKey || "");
+      const seatId = escapeHtml(t.seatId || "");
+
+      tr.innerHTML = `
+        <td style="padding:10px;white-space:nowrap;">${date}</td>
+        <td style="padding:10px;font-weight:800;">${action}</td>
+        <td style="padding:10px;">${eventId}</td>
+        <td style="padding:10px;">${showKey}</td>
+        <td style="padding:10px;font-weight:800;">${seatId}</td>
+      `;
+      txTbody.appendChild(tr);
+    });
+  } catch (e) {
+    showErrorMessage(e, "loading transactions");
+    txStatus.textContent = "Failed to load transactions.";
+  }
+}
+
+myTxBtn?.addEventListener("click", async () => {
+  if (!auth.currentUser) {
+    alert("Please log in first.");
+    return;
+  }
+  openTxModal();
+  await loadMyTransactions(auth.currentUser.uid);
+});
+</script>
+
+
+<!-- ✅ Transactions Modal -->
+<div id="txModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;max-width:850px;width:100%;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.35);overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#111;color:#fff;">
+      <div style="font-weight:800;">My Transactions</div>
+      <button id="txCloseBtn" style="background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:14px 16px;">
+      <div id="txStatus" style="font-family:'Segoe UI',Arial,sans-serif;color:#555;margin-bottom:10px;">Loading…</div>
+      <div style="overflow:auto;">
+        <table style="width:100%;border-collapse:collapse;font-family:'Segoe UI',Arial,sans-serif;">
+          <thead>
+            <tr style="text-align:left;border-bottom:1px solid #eee;">
+              <th style="padding:10px;">Date</th>
+              <th style="padding:10px;">Action</th>
+              <th style="padding:10px;">Event</th>
+              <th style="padding:10px;">Show</th>
+              <th style="padding:10px;">Seat</th>
+            </tr>
+          </thead>
+          <tbody id="txTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

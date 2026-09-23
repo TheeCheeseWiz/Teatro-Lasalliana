@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transactions</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body{
+      font-family: Georgia, serif;
+      display: flex;
+      min-height: 100vh;
+      background: #dcdcdc;
+      color: #111;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar{
+      width: 260px;
+      background: #f4e21b;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar-header{
+      text-align: center;
+      font-weight: bold;
+      margin-bottom: 20px;
+      line-height: 1.1;
+    }
+
+    .sidebar-header span{
+      font-size: 26px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .sidebar a{
+      display: block;
+      background: #111;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      text-align: center;
+      transition: 0.2s ease;
+      font-size: 14px;
+    }
+
+    .sidebar a:hover{
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    /* ===== CONTENT ===== */
+    .content{
+      flex: 1;
+      padding: 40px;
+      overflow-x: auto;
+    }
+
+    .title{
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .subtitle{
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+      margin-bottom: 20px;
+    }
+
+    .top-controls{
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .top-controls label{
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .top-controls select{
+      min-width: 280px;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #bbb;
+      font-family: Georgia, serif;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    .summary-card{
+      background: #efefef;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .summary-box{
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      min-width: 180px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .summary-box small{
+      display: block;
+      color: rgba(0,0,0,0.55);
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .summary-box strong{
+      font-size: 18px;
+    }
+
+    /* ===== TABLE ===== */
+    .table-card{
+      background: #efefef;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+
+    .table-wrap{
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table{
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    thead{
+      background: #111;
+      color: white;
+    }
+
+    th, td{
+      padding: 14px 16px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      font-size: 14px;
+      vertical-align: top;
+    }
+
+    tbody tr{
+      background: #fafafa;
+    }
+
+    tbody tr:hover{
+      background: #f2f2f2;
+    }
+
+    .status-paid{
+      color: green;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+
+    .status-pending{
+      color: orange;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+
+    .status-reserved{
+      color: #444;
+      font-weight: bold;
+      text-transform: capitalize;
+    }
+
+    .payment{
+      font-weight: bold;
+    }
+
+    .empty{
+      padding: 20px;
+      color: rgba(0,0,0,0.65);
+      font-size: 14px;
+    }
+
+    @media (max-width: 768px){
+      body{ flex-direction: column; }
+
+      .sidebar{
+        width: 100%;
+      }
+
+      .content{
+        padding: 18px;
+      }
+
+      .top-controls select{
+        width: 100%;
+        min-width: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div>
+      <div class="sidebar-header">
+        <span>🎭</span>
+        Admin Dashboard
+      </div>
+
+      <a href="Admin.html">Dashboard</a>
+      <a href="ManageEvents.html">Manage Events</a>
+      <a href="History.html">Archive</a>
+      <a href="Transaction.html">Transactions</a>
+<a href="index.html">
+  <span style="margin-right:6px;">👁</span>Preview Site
+</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="title">Transactions</div>
+    <div class="subtitle">View all bookings and filter them by play.</div>
+
+    <div class="top-controls">
+      <label for="playFilter">Filter by Play:</label>
+      <select id="playFilter">
+        <option value="all">All Plays</option>
+      </select>
+      <button class="export-btn" id="exportTransactionsBtn" style="background:#111;color:#fff;border:none;padding:12px 20px;border-radius:10px;cursor:pointer;font-weight:bold;margin-left:auto;">
+        📥 Export to CSV
+      </button>
+    </div>
+
+    <div class="summary-card">
+      <div class="summary-box">
+        <small>Selected Play</small>
+        <strong id="selectedPlayText">All Plays</strong>
+      </div>
+      <div class="summary-box">
+        <small>Total Transactions</small>
+        <strong id="totalTransactions">0</strong>
+      </div>
+      <div class="summary-box">
+        <small>Total Seats Booked</small>
+        <strong id="totalSeats">0</strong>
+      </div>
+      <div class="summary-box">
+        <small>Total Revenue</small>
+        <strong id="totalRevenue">₱0</strong>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Play</th>
+              <th>Seats</th>
+              <th>Payment Method</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody id="transactionsTable">
+            <tr>
+              <td colspan="6" class="empty">Loading transactions...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script type="module">
+  import "./js/alerts.js"; // Custom alert system
+  import { db, auth } from "./js/firebase-config.js";
+  import { initializeApp } 
+    from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+
+  import { getFirestore, collection, getDocs, doc, getDoc } 
+    from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+  import { getAuth, onAuthStateChanged } 
+    from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCA212oYhwdJjb4aLMCWOIJXb2xRwzQylc",
+    authDomain: "teatrocapstone.firebaseapp.com",
+    projectId: "teatrocapstone",
+    storageBucket: "teatrocapstone.appspot.com",
+    messagingSenderId: "434560617971",
+    appId: "1:434560617971:web:47a8f9c132d014f4429686",
+    measurementId: "G-W6221CLGNG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  const table = document.getElementById("transactionsTable");
+  const playFilter = document.getElementById("playFilter");
+  const selectedPlayText = document.getElementById("selectedPlayText");
+  const totalTransactions = document.getElementById("totalTransactions");
+  const totalSeats = document.getElementById("totalSeats");
+  const totalRevenue = document.getElementById("totalRevenue");
+
+  let allTransactions = [];
+
+  // ADMIN CHECK
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "Login.html";
+      return;
+    }
+
+    const snap = await getDoc(doc(db, "users", user.uid));
+
+    if (!snap.exists() || snap.data().role !== "admin") {
+      alert("Access denied");
+      window.location.href = "index.html";
+      return;
+    }
+
+    await loadTransactions();
+  });
+
+  async function loadTransactions() {
+    table.innerHTML = `<tr><td colspan="6" class="empty">Loading transactions...</td></tr>`;
+
+    const ordersSnap = await getDocs(collection(db, "orders"));
+
+    if (ordersSnap.empty) {
+      table.innerHTML = `<tr><td colspan="6" class="empty">No transactions found</td></tr>`;
+      return;
+    }
+
+    const playMap = new Map();
+    const transactions = [];
+
+    for (const docSnap of ordersSnap.docs) {
+      const data = docSnap.data();
+
+      const email = data.userEmail || "Unknown";
+      const seatsArray = Array.isArray(data.seats) ? data.seats : [];
+      const seats = seatsArray.join(", ");
+      const method = data.paymentMethod || "N/A";
+      const status = data.status || "pending";
+      const eventId = data.eventId || "";
+      const total = Number(data.total || 0);
+
+      let playTitle = eventId || "Unknown Play";
+
+      try {
+        const eventSnap = await getDoc(doc(db, "events", eventId));
+        if (eventSnap.exists()) {
+          playTitle = eventSnap.data().title || eventId;
+        } else {
+          const historySnap = await getDoc(doc(db, "history", eventId));
+          if (historySnap.exists()) {
+            playTitle = historySnap.data().title || eventId;
+          }
+        }
+      } catch (e) {
+        console.warn("Could not load event title for", eventId, e);
+      }
+
+      const date = data.createdAt?.toDate
+        ? data.createdAt.toDate().toLocaleString()
+        : "—";
+
+      transactions.push({
+        email,
+        playTitle,
+        seats,
+        seatsCount: seatsArray.length,
+        method,
+        status,
+        total,
+        date
+      });
+
+      if (!playMap.has(playTitle)) {
+        playMap.set(playTitle, true);
+      }
+    }
+
+    allTransactions = transactions;
+
+    // Fill filter dropdown
+    playFilter.innerHTML = `<option value="all">All Plays</option>`;
+    [...playMap.keys()].sort().forEach(play => {
+      const option = document.createElement("option");
+      option.value = play;
+      option.textContent = play;
+      playFilter.appendChild(option);
+    });
+
+    renderTransactions("all");
+  }
+
+  function renderTransactions(selectedPlay) {
+    let filtered = allTransactions;
+
+    if (selectedPlay !== "all") {
+      filtered = allTransactions.filter(t => t.playTitle === selectedPlay);
+    }
+
+    selectedPlayText.textContent = selectedPlay === "all" ? "All Plays" : selectedPlay;
+
+    totalTransactions.textContent = filtered.length;
+    totalSeats.textContent = filtered.reduce((sum, t) => sum + t.seatsCount, 0);
+    totalRevenue.textContent = `₱${filtered.reduce((sum, t) => sum + t.total, 0)}`;
+
+    if (!filtered.length) {
+      table.innerHTML = `<tr><td colspan="6" class="empty">No transactions found for this play.</td></tr>`;
+      return;
+    }
+
+    let rows = "";
+
+    filtered.forEach(data => {
+      let statusClass = "status-reserved";
+      if (data.status === "paid") statusClass = "status-paid";
+      if (data.status === "pending") statusClass = "status-pending";
+
+      rows += `
+        <tr>
+          <td>${escapeHtml(data.email)}</td>
+          <td>${escapeHtml(data.playTitle)}</td>
+          <td>${escapeHtml(data.seats || "-")}</td>
+          <td class="payment">${escapeHtml(data.method)}</td>
+          <td class="${statusClass}">${escapeHtml(data.status)}</td>
+          <td>${escapeHtml(data.date)}</td>
+        </tr>
+      `;
+    });
+
+    table.innerHTML = rows;
+  }
+
+  playFilter.addEventListener("change", () => {
+    renderTransactions(playFilter.value);
+  });
+
+  // ===== CSV EXPORT FUNCTION =====
+  
+  function exportTransactionsToCSV() {
+    const timestamp = new Date().toISOString().split('T')[0];
+    const selectedPlay = playFilter.value;
+    const playName = selectedPlay === "all" ? "All-Plays" : selectedPlay.replace(/[^a-z0-9]/gi, '-');
+    
+    let filtered = allTransactions;
+    if (selectedPlay !== "all") {
+      filtered = allTransactions.filter(t => t.playTitle === selectedPlay);
+    }
+    
+    if (filtered.length === 0) {
+      alert("⚠️ No transactions to export.");
+      return;
+    }
+    
+    let csvContent = "Teatro Lasalliana - Transactions Report\n";
+    csvContent += `Generated: ${new Date().toLocaleString()}\n`;
+    csvContent += `Filter: ${selectedPlay === "all" ? "All Plays" : selectedPlay}\n\n`;
+    
+    // Summary Section
+    csvContent += "SUMMARY\n";
+    csvContent += "Metric,Value\n";
+    csvContent += `Total Transactions,${filtered.length}\n`;
+    csvContent += `Total Seats Booked,${filtered.reduce((sum, t) => sum + t.seatsCount, 0)}\n`;
+    csvContent += `Total Revenue,₱${filtered.reduce((sum, t) => sum + t.total, 0)}\n`;
+    csvContent += `\n`;
+    
+    // Transaction Details
+    csvContent += "TRANSACTION DETAILS\n";
+    csvContent += "Date,Email,Play,Seats,Payment Method,Status,Amount\n";
+    
+    filtered.forEach(t => {
+      // Escape quotes in fields
+      const email = `\"${t.email.replace(/"/g, '""')}\"`;  
+      const play = `\"${t.playTitle.replace(/"/g, '""')}\"`;  
+      const seats = `\"${(t.seats || '-').replace(/"/g, '""')}\"`;  
+      const method = t.method || 'N/A';
+      const status = t.status || 'pending';
+      const date = t.date || '—';
+      
+      csvContent += `${date},${email},${play},${seats},${method},${status},₱${t.total}\n`;
+    });
+    
+    // Play Breakdown
+    csvContent += `\n`;
+    csvContent += "BREAKDOWN BY PLAY\n";
+    csvContent += "Play,Transactions,Seats,Revenue\n";
+    
+    const playBreakdown = {};
+    filtered.forEach(t => {
+      if (!playBreakdown[t.playTitle]) {
+        playBreakdown[t.playTitle] = { count: 0, seats: 0, revenue: 0 };
+      }
+      playBreakdown[t.playTitle].count++;
+      playBreakdown[t.playTitle].seats += t.seatsCount;
+      playBreakdown[t.playTitle].revenue += t.total;
+    });
+    
+    Object.keys(playBreakdown).sort().forEach(play => {
+      const data = playBreakdown[play];
+      csvContent += `\"${play.replace(/"/g, '""')}\",${data.count},${data.seats},₱${data.revenue}\n`;
+    });
+    
+    // Create download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `teatro-transactions-${playName}-${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert(`✅ Exported ${filtered.length} transactions successfully!`);
+  }
+  
+  document.getElementById('exportTransactionsBtn')?.addEventListener('click', exportTransactionsToCSV);
+
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+</script>
+
+</body>
+</html>

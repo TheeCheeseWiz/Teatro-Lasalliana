@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Teatro Hall</title>
+
+<style>
+
+/* ===== RESET ===== */
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+/* ===== BODY ===== */
+body{
+font-family: Georgia, serif;
+background:#d9d9d9;
+color:#111;
+min-height:100vh;
+}
+
+/* ===== HEADER / NAVBAR ===== */
+.header{
+background:#efefef;
+padding:15px 40px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+border-bottom:1px solid #ccc;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:12px;
+font-weight:bold;
+}
+
+.logo img{
+height:40px;
+}
+
+.nav{
+display:flex;
+gap:25px;
+}
+
+.nav a{
+text-decoration:none;
+color:#111;
+font-size:14px;
+}
+
+.nav a:hover{
+text-decoration:underline;
+}
+
+/* ===== PAGE WRAPPER ===== */
+.page{
+width:100%;
+padding:30px 60px;
+}
+
+/* ===== TITLE ===== */
+.page-title{
+font-size:32px;
+font-weight:bold;
+margin-bottom:20px;
+color:#7a7a7a;
+}
+
+/* ===== TOP INFO BAR ===== */
+.top-info{
+background:#efefef;
+padding:14px 20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-size:14px;
+margin-bottom:20px;
+border-radius:6px;
+}
+
+.top-info-left{
+display:flex;
+gap:25px;
+}
+
+/* ===== MAIN CONTENT ===== */
+.content-box{
+background:#2f3333;
+padding:30px;
+display:grid;
+grid-template-columns: 1.2fr 1fr;
+gap:30px;
+min-height:420px;
+}
+
+/* ===== TABS ===== */
+.tabs{
+display:flex;
+gap:20px;
+border-bottom:1px solid rgba(255,255,255,0.3);
+margin-bottom:16px;
+padding-bottom:8px;
+}
+
+.tab{
+color:white;
+font-size:13px;
+position:relative;
+}
+
+.tab.active::after{
+content:"";
+position:absolute;
+bottom:-9px;
+left:0;
+width:100%;
+height:2px;
+background:#f3df1f;
+}
+
+/* ===== DESCRIPTION ===== */
+.description{
+color:white;
+font-size:14px;
+line-height:1.8;
+}
+
+.description h3{
+margin-bottom:10px;
+}
+
+/* ===== IMAGE ===== */
+.image-box{
+border:4px solid #efefef;
+background:white;
+overflow:hidden;
+}
+
+.image-box img{
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+/* ===== MOBILE ===== */
+@media(max-width:900px){
+
+.page{
+padding:20px;
+}
+
+.content-box{
+grid-template-columns:1fr;
+}
+
+.header{
+flex-direction:column;
+gap:10px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+
+<div class="logo">
+<img src="Teatro logo.png">
+<span>TEATRO Lasalliana</span>
+</div>
+
+<div class="nav">
+<a href="index.html">Home</a>
+<a href="index.html#eventsSection">Premieres</a>
+<a href="Teatro.html">Teatro</a>
+<a href="About.html">About Us</a>
+</div>
+
+</div>
+
+
+<div class="page">
+
+
+
+<div class="top-info">
+<div class="top-info-left">
+<span>100 people</span>
+<span>DLSU Dasma</span>
+</div>
+<div>Pictures</div>
+</div>
+
+
+<div class="content-box">
+
+<div>
+
+<div class="tabs">
+<div class="tab active">Teatro Hall</div>
+</div>
+
+<div class="description">
+
+<h3>Description</h3>
+
+<p>
+Gregoria Montoya Hall is one of the central buildings of De La Salle University–Dasmariñas, located in Dasmariñas. The building plays an important role in the daily operations of the university because it houses several administrative offices and spaces used for institutional activities.
+
+The hall was named after Gregoria Montoya y Patricio, a woman from Cavite who participated in the Philippine Revolution. She is remembered as one of the few female fighters of the Katipunan who bravely joined the revolution against Spanish colonial forces. Her legacy symbolizes courage, patriotism, and dedication to the Filipino nation, which aligns with the university’s mission of forming socially responsible and patriotic graduates.
+</p>
+
+<br>
+
+<p>
+Within the DLSU–Dasmariñas campus, Gregoria Montoya Hall functions primarily as an administrative and event venue. It contains offices that manage important university services and also provides spaces where institutional programs, meetings, and cultural activities are conducted. Over the years, the hall has become a familiar landmark on campus, frequently visited by students for official transactions and university events.
+
+Today, Gregoria Montoya Hall continues to serve as a significant facility within the university. It represents both the historical heritage of Cavite and the commitment of De La Salle University–Dasmariñas to honor Filipino heroes while providing spaces that support academic and cultural development.
+</p>
+
+</div>
+</div>
+
+
+<div class="image-box">
+<img src="https://www.dlsud.edu.ph/aboutDLSUD/assets/img/tourDLSUD/jfh.png">
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

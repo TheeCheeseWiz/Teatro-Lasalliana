@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Event History</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body{
+      font-family: Georgia, serif;
+      display: flex;
+      min-height: 100vh;
+      background: #dcdcdc;
+      color: #111;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar{
+      width: 260px;
+      background: #f4e21b;
+      min-height: 100vh;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+    }
+
+    .sidebar-header{
+      text-align: center;
+      font-weight: bold;
+      color: #000;
+      margin-bottom: 25px;
+      line-height: 1.1;
+    }
+
+    .sidebar-header .icon{
+      font-size: 26px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .sidebar-header .title{
+      font-size: 22px;
+    }
+
+    .sidebar-header .sub{
+      font-size: 18px;
+    }
+
+    .nav{
+      margin-top: 10px;
+    }
+
+    /* Navigation - Reverted to Neutral[cite: 2] */
+    .sidebar a{
+      display: block;
+      background: #111;
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      text-align: center;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .sidebar a:hover{
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    .sidebar-footer{
+      text-align: center;
+      font-size: 12px;
+      color: #111;
+      opacity: 0.9;
+    }
+
+    /* ===== CONTENT ===== */
+    .content{
+      flex: 1;
+      padding: 40px;
+    }
+
+    .page-title{
+      font-size: 30px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .subtext{
+      font-size: 14px;
+      color: #222;
+      margin-bottom: 20px;
+    }
+
+    /* ===== POSTER GRID ===== */
+    #historyList{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .poster-card{
+      position: relative;
+      background: #efefef;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+      border: 1px solid rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: 0.2s ease;
+      min-height: 340px;
+    }
+
+    .poster-card:hover{
+      transform: translateY(-4px);
+      box-shadow: 0 10px 22px rgba(0,0,0,0.16);
+    }
+
+    .poster-card img{
+      width: 100%;
+      height: 100%;
+      min-height: 340px;
+      max-height: 420px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .poster-card .fallback{
+      width: 100%;
+      min-height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: #ececec;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      line-height: 1.3;
+    }
+
+    .poster-overlay{
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 14px;
+      background: linear-gradient(to top, rgba(0,0,0,0.82), rgba(0,0,0,0.12));
+      color: #fff;
+    }
+
+    .poster-title{
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .poster-meta{
+      font-size: 12px;
+      opacity: 0.95;
+      line-height: 1.4;
+    }
+
+    .empty-state{
+      padding: 24px;
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+      background: #efefef;
+      border-radius: 12px;
+    }
+
+    /* ===== MODAL ===== */
+    .modal{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+
+    .modal.show{
+      display: flex;
+    }
+
+    .modal-box{
+      width: 100%;
+      max-width: 980px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #efefef;
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+      overflow-x: hidden;
+    }
+
+    .modal-top{
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 22px;
+      padding: 22px;
+    }
+
+    .modal-poster{
+      width: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #ddd;
+      min-height: 420px;
+    }
+
+    .modal-poster img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .modal-fallback{
+      min-height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      line-height: 1.3;
+      background: #ececec;
+    }
+
+    .modal-info h2{
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .modal-info p{
+      font-size: 14px;
+      margin-bottom: 8px;
+      line-height: 1.5;
+      color: #111;
+    }
+
+    .label{
+      font-weight: bold;
+    }
+
+    /* Positive Action - Gold[cite: 2] */
+    .restore-btn{
+      background: #f4e21b;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      font-weight: bold;
+      transition: 0.2s ease;
+      margin-right: auto;
+    }
+
+    .restore-btn:hover{
+      background: #e5d319;
+    }
+
+    .desc-box{
+      margin-top: 14px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 12px;
+      padding: 14px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .stats{
+      margin-top: 14px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.10);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stats p{
+      margin: 6px 0;
+    }
+
+    .showtimes-box{
+      padding: 0 22px 22px;
+    }
+
+    .showtimes-title{
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .showtime-list{
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .showtime-item{
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .modal-actions{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 0 22px 22px;
+    }
+
+    /* Negative Action - Red[cite: 2] */
+    .close-btn{
+      background: #b22222;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .close-btn:hover{
+      background: #8b0000;
+    }
+
+    /* Navigation Style Preview Button[cite: 2] */
+    .preview-btn:hover{
+      background: #333;
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 900px){
+      .modal-top{
+        grid-template-columns: 1fr;
+      }
+
+      .modal-poster,
+      .modal-fallback{
+        min-height: 320px;
+      }
+    }
+
+    @media (max-width: 768px){
+      body{ flex-direction: column; }
+      .sidebar{ width: 100%; min-height: auto; position: static; }
+      .content{ padding: 18px; }
+      .page-title{ font-size: 24px; }
+      #historyList{
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      }
+      .poster-card{
+        min-height: 260px;
+      }
+      .poster-card img,
+      .poster-card .fallback{
+        min-height: 260px;
+        max-height: 320px;
+      }
+    }
+</style>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <div>
+      <div class="sidebar-header">
+        <span class="icon">🎭</span>
+        <div class="title">Admin</div>
+        <div class="sub">Dashboard</div>
+      </div>
+
+      <div class="nav">
+        <a href="Admin.html">Dashboard</a>
+        <a href="ManageEvents.html">Manage Events</a>
+        <a href="History.html">Archive</a>
+        <a href="Transaction.html">Transactions</a>
+<a href="index.html">
+  <span style="margin-right:6px;">👁</span>Preview Site
+</a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      Follow TEATRO Lasalliana<br>
+      📷 Instagram • 👍 Facebook
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="page-title">Event History</div>
+    <div class="subtext">Click a show poster to view all archived details.</div>
+    <div id="historyList"></div>
+  </div>
+
+  <div class="modal" id="historyModal">
+    <div class="modal-box">
+      <div class="modal-top">
+        <div class="modal-poster" id="modalPosterWrap"></div>
+
+        <div class="modal-info">
+          <h2 id="modalTitle">Title</h2>
+          <p><span class="label">Venue:</span> <span id="modalVenue"></span></p>
+          <p><span class="label">Price:</span> <span id="modalPrice"></span></p>
+          <p><span class="label">Deleted At:</span> <span id="modalDeletedAt"></span></p>
+          <p><span class="label">Deleted By:</span> <span id="modalDeletedBy"></span></p>
+
+          <div class="stats">
+            <p><span class="label">Seats Taken:</span> <span id="modalTakenSeats"></span></p>
+            <p><span class="label">Total Seats:</span> <span id="modalTotalSeats"></span></p>
+            <p><span class="label">Profit:</span> <span id="modalProfit"></span></p>
+          </div>
+
+          <div class="desc-box">
+            <div class="label" style="margin-bottom:8px;">Description</div>
+            <div id="modalDescription"></div>
+          </div>
+        </div>
+      </div>
+      
+
+      <div class="showtimes-box">
+        <div class="showtimes-title">Show Details</div>
+        <div class="showtime-list" id="modalShowtimes"></div>
+      </div>
+
+      <div class="modal-actions">
+  <button class="restore-btn" id="restoreBtn">Restore</button>
+  <a class="preview-btn" id="previewSiteBtn" href="#" title="Preview Site"></a>
+  <button class="close-btn" id="closeModalBtn">Close</button>
+</div>
+
+
+
+  
+
+  
+  
+
+  <script type="module">
+    import "./js/alerts.js"; // Custom alert system
+    import { db, auth } from "./js/firebase-config.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { collection, getDocs, doc, getDoc, query, orderBy, setDoc, deleteDoc } 
+      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } 
+      from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCA212oYhwdJjb4aLMCWOIJXb2xRwzQylc",
+      authDomain: "teatrocapstone.firebaseapp.com",
+      projectId: "teatrocapstone",
+      storageBucket: "teatrocapstone.appspot.com",
+      messagingSenderId: "434560617971",
+      appId: "1:434560617971:web:47a8f9c132d014f4429686",
+      measurementId: "G-W6221CLGNG"
+    };
+
+    const historyList = document.getElementById("historyList");
+    const historyModal = document.getElementById("historyModal");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const previewSiteBtn = document.getElementById("previewSiteBtn");
+
+    const modalPosterWrap = document.getElementById("modalPosterWrap");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalVenue = document.getElementById("modalVenue");
+    const modalPrice = document.getElementById("modalPrice");
+    const modalDeletedAt = document.getElementById("modalDeletedAt");
+    const modalDeletedBy = document.getElementById("modalDeletedBy");
+    const modalTakenSeats = document.getElementById("modalTakenSeats");
+    const modalTotalSeats = document.getElementById("modalTotalSeats");
+    const modalProfit = document.getElementById("modalProfit");
+    const modalDescription = document.getElementById("modalDescription");
+    const modalShowtimes = document.getElementById("modalShowtimes");
+
+    const restoreBtn = document.getElementById("restoreBtn");
+
+    let selectedHistoryId = null;
+    let selectedHistoryData = null;
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function openModal(data, docId) {
+      selectedHistoryId = docId;
+      selectedHistoryData = data;
+      modalTitle.textContent = data.title || "Untitled";
+      modalVenue.textContent = data.venue || "Unknown";
+      modalPrice.textContent = `₱${data.price || 0}`;
+      modalDeletedAt.textContent = data.deletedAt?.toDate?.().toLocaleString?.() || "Unknown";
+      modalDeletedBy.textContent = data.deletedByEmail || data.deletedBy || "Unknown";
+      modalTakenSeats.textContent = data.takenSeats || 0;
+      modalTotalSeats.textContent = data.totalSeats || 0;
+      modalProfit.textContent = `₱${data.profit || 0}`;
+      modalDescription.textContent = data.description || "No description provided.";
+
+      if (data.imageUrl) {
+        modalPosterWrap.innerHTML = `<img src="${data.imageUrl}" alt="${escapeHtml(data.title || 'Poster')}">`;
+      } else {
+        modalPosterWrap.innerHTML = `<div class="modal-fallback">${escapeHtml(data.title || "Archived Show")}</div>`;
+      }
+
+      const previewId = data.originalEventId || data.eventId || docId || "";
+      previewSiteBtn.href = previewId ? `Play.html?event=${encodeURIComponent(previewId)}` : "#";
+
+      const showtimes = Array.isArray(data.showtimes) ? data.showtimes : [];
+      if (!showtimes.length) {
+        modalShowtimes.innerHTML = `<div class="showtime-item">No showtimes available.</div>`;
+      } else {
+        modalShowtimes.innerHTML = showtimes.map((st, index) => `
+          <div class="showtime-item">
+            <div><span class="label">Show ${index + 1}:</span> ${escapeHtml(st.date || "No date")}</div>
+            <div><span class="label">Time:</span> ${escapeHtml(st.start || "--")} – ${escapeHtml(st.end || "--")}</div>
+          </div>
+        `).join("");
+      }
+
+      historyModal.classList.add("show");
+    }
+
+    function closeModal() {
+      historyModal.classList.remove("show");
+    }
+
+    closeModalBtn.addEventListener("click", closeModal);
+    historyModal.addEventListener("click", (e) => {
+      if (e.target === historyModal) closeModal();
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) return window.location.href = "Login.html";
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists() || snap.data().role !== "admin") {
+        alert("🚫 Access denied.");
+        window.location.href = "index.html";
+      } else {
+        loadHistory();
+      }
+    });
+
+    async function loadHistory() {
+      historyList.innerHTML = `<div class="empty-state">Loading...</div>`;
+
+        const snapshot = await getDocs(query(collection(db, "history"), orderBy("deletedAt", "desc")));
+        if (snapshot.empty) {
+          historyList.innerHTML = `<div class="empty-state">No past events archived.</div>`;
+          return;
+        }
+
+        historyList.innerHTML = "";
+
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const docId = docSnap.id;
+          const card = document.createElement("div");
+          card.className = "poster-card";
+
+          const deletedAt = data.deletedAt?.toDate?.().toLocaleDateString?.() || "Unknown";
+
+          card.innerHTML = `
+            ${data.imageUrl
+              ? `<img src="${data.imageUrl}" alt="${escapeHtml(data.title || 'Archived Show')}">`
+              : `<div class="fallback">${escapeHtml(data.title || "Archived Show")}</div>`
+            }
+            <div class="poster-overlay">
+              <div class="poster-title">${escapeHtml(data.title || "Untitled")}</div>
+              <div class="poster-meta">
+                ${escapeHtml(data.venue || "Unknown Venue")}<br>
+                Archived: ${escapeHtml(deletedAt)}
+              </div>
+            </div>
+          `;
+
+          card.addEventListener("click", () => openModal(data, docId));
+          historyList.appendChild(card);
+        });
+      }
+
+  restoreBtn.addEventListener("click", async () => {
+  if (!selectedHistoryData || !selectedHistoryId) return;
+
+  const userConfirmed = await window.confirm("Restore this event?");
+  if (!userConfirmed) return;
+
+  try {
+    const eventId = selectedHistoryData.originalEventId || selectedHistoryId;
+
+    const existing = await getDoc(doc(db, "events", eventId));
+    if (existing.exists()) {
+      alert("Event already exists in events collection.");
+      return;
+    }
+
+    const { deletedAt, deletedBy, deletedByEmail, ...cleanData } = selectedHistoryData;
+
+    await setDoc(doc(db, "events", eventId), cleanData);
+    await deleteDoc(doc(db, "history", selectedHistoryId));
+
+    alert("Event restored successfully!");
+    closeModal();
+    loadHistory();
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to restore event.");
+  }
+});
+  </script>
+
+</body>
+</html>

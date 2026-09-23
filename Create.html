@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Event</title>
+
+<style>
+/* ===== RESET ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Georgia, serif;
+  display: flex;
+  min-height: 100vh;
+  background: #dcdcdc;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 260px;
+  background: #f3df1f;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+  justify-content: space-between;
+}
+
+.sidebar-top { display: flex; flex-direction: column; gap: 25px; }
+
+.logo {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: black;
+}
+
+.logo span { display: block; font-size: 28px; }
+
+.sidebar a {
+  display: block;
+  background: #1e1e1e;
+  color: white;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 15px;
+  transition: 0.2s;
+}
+.sidebar a:hover { background: #333; transform: scale(1.03); }
+
+/* ===== CONTENT ===== */
+.content { flex: 1; padding: 40px; }
+
+h1 { font-size: 28px; margin-bottom: 25px; font-weight: bold; }
+
+/* ===== FORM ===== */
+form {
+  background: #ececec;
+  padding: 25px;
+  border-radius: 15px;
+  max-width: 760px;
+}
+
+label { display: block; margin: 12px 0 5px; font-weight: bold; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #bbb;
+  font-family: Georgia, serif;
+}
+
+textarea{
+  min-height: 110px;
+  resize: vertical;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border: 1px solid #1e1e1e;
+}
+
+/* ===== DATE & TIME GROUP ===== */
+.date-group {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+.time-group { margin-top: 8px; }
+
+.time-group input {
+  width: 45%;
+  display: inline-block;
+}
+
+.time-group button {
+  background: #1e1e1e;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 5px;
+}
+.time-group button:hover { background: #333; }
+
+/* ===== BUTTONS ===== */
+button {
+  background: #1e1e1e;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  margin-top: 10px;
+  transition: 0.2s;
+}
+button:hover { background: #333; transform: scale(1.02); }
+
+/* Save Button Special */
+button[type="submit"] { background: #000; font-weight: bold; }
+
+#preview { margin-top: 20px; font-size: 14px; }
+#preview img { max-width: 200px; margin-top: 10px; border-radius: 10px; }
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo">
+      🎭
+      <span>Event</span>
+      Create
+    </div>
+
+    <div>
+      <a href="Admin.html">Dashboard</a>
+      <a href="Create.html">Event Editor</a>
+      <a href="Delete.html">Delete</a>
+      <a href="History.html">History</a>
+      <a href="Transaction.html">Transactions</a>
+      <a href="index.html">Go to Site</a>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <h1>Create Event</h1>
+
+  <form id="eventForm">
+    <label>Event Title</label>
+    <input type="text" id="eventTitle" required>
+
+    <label>Venue</label>
+    <input type="text" id="eventVenue" required>
+
+    <label>Price (₱)</label>
+    <input type="number" id="eventPrice" required>
+
+    <label>Image URL (Poster)</label>
+    <input type="url" id="eventImageUrl" placeholder="https://example.com/poster.jpg">
+
+    <!-- ✅ NEW: DESCRIPTION (saved to Firestore as "description") -->
+    <label>Description</label>
+    <textarea id="eventDescription" placeholder="Write the play description here..." required></textarea>
+
+    <!-- ✅ OPTIONAL (Play.html already supports these fields) -->
+    <label>Duration (minutes) (optional)</label>
+    <input type="number" id="eventDuration" placeholder="e.g. 140">
+
+    <label>Age Rating (optional)</label>
+    <input type="text" id="eventAgeRating" placeholder="e.g. 14+">
+
+    <h3 style="margin-top:20px;">Show Dates & Times</h3>
+    <div id="datesContainer"></div>
+
+    <button type="button" id="addDateBtn">➕ Add Day</button>
+    <button type="submit">💾 Save Event</button>
+  </form>
+
+  <div id="preview"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCA212oYhwdJjb4aLMCWOIJXb2xRwzQylc",
+    authDomain: "teatrocapstone.firebaseapp.com",
+    projectId: "teatrocapstone",
+    storageBucket: "teatrocapstone.appspot.com",
+    messagingSenderId: "434560617971",
+    appId: "1:434560617971:web:47a8f9c132d014f4429686",
+    measurementId: "G-W6221CLGNG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  // 🔐 Admin check (role-based)
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      alert("⚠️ Please log in as admin first.");
+      window.location.href = "Login.html";
+      return;
+    }
+
+    try {
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+      if (!userSnap.exists() || userSnap.data().role !== "admin") {
+        alert("🚫 Access denied. Admin only.");
+        window.location.href = "index.html";
+        return;
+      }
+    } catch (e) {
+      console.error("Admin check failed:", e);
+      alert("⚠️ Unable to verify admin access. Please try again.");
+      window.location.href = "index.html";
+      return;
+    }
+  });
+
+  // ➕ Add new date section
+  document.getElementById("addDateBtn").addEventListener("click", () => {
+    const container = document.getElementById("datesContainer");
+    const dateDiv = document.createElement("div");
+    dateDiv.classList.add("date-group");
+    dateDiv.innerHTML = `
+      <label>📅 Select Date:</label>
+      <input type="date" class="eventDate" required>
+      <div class="timesContainer"></div>
+      <button type="button" class="addTimeBtn">Add Showtime</button>
+    `;
+    container.appendChild(dateDiv);
+
+    // 🎞️ Add showtime inside each day
+    dateDiv.querySelector(".addTimeBtn").addEventListener("click", () => {
+      const timesDiv = dateDiv.querySelector(".timesContainer");
+      const timeGroup = document.createElement("div");
+      timeGroup.classList.add("time-group");
+      timeGroup.innerHTML = `
+        <input type="time" class="startTime" required> to 
+        <input type="time" class="endTime" required>
+        <button type="button" class="removeTimeBtn">❌</button>
+      `;
+      timesDiv.appendChild(timeGroup);
+      timeGroup.querySelector(".removeTimeBtn").addEventListener("click", () => timeGroup.remove());
+    });
+  });
+
+  // 💾 Save event and generate seat maps
+  document.getElementById("eventForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById("eventTitle").value.trim();
+    const venue = document.getElementById("eventVenue").value.trim();
+    const price = parseFloat(document.getElementById("eventPrice").value.trim());
+    const imageUrl = document.getElementById("eventImageUrl").value.trim();
+
+    // ✅ NEW fields
+    const description = document.getElementById("eventDescription").value.trim();
+    const durationVal = document.getElementById("eventDuration").value.trim();
+    const ageRatingVal = document.getElementById("eventAgeRating").value.trim();
+
+    const eventId = title.toLowerCase().replace(/\s+/g, "-");
+
+    const showtimes = [];
+    const dateGroups = document.querySelectorAll(".date-group");
+    dateGroups.forEach(dateGroup => {
+      const date = dateGroup.querySelector(".eventDate").value;
+      const timeGroups = dateGroup.querySelectorAll(".time-group");
+      timeGroups.forEach(timeGroup => {
+        const start = timeGroup.querySelector(".startTime").value;
+        const end = timeGroup.querySelector(".endTime").value;
+        if (date && start && end) showtimes.push({ date, start, end });
+      });
+    });
+
+    if (!showtimes.length) {
+      alert("⚠️ Please add at least one date and showtime.");
+      return;
+    }
+
+    if (!description) {
+      alert("⚠️ Please add a description.");
+      return;
+    }
+
+    // ✅ Save fields that Play.html reads
+    await setDoc(doc(db, "events", eventId), {
+      title,
+      venue,
+      price,
+      imageUrl,
+      showtimes,
+
+      // NEW
+      description,
+
+      // optional (Play.html already supports)
+      duration: durationVal ? Number(durationVal) : null,
+      ageRating: ageRatingVal ? ageRatingVal : null
+    });
+
+    // 🎫 Create seats for each show (same logic)
+    const rows = 5, cols = 10;
+    for (let i = 0; i < showtimes.length; i++) {
+      const showKey = `${eventId}_show${i+1}`;
+      for (let r = 0; r < rows; r++) {
+        const rowLetter = String.fromCharCode(65 + r);
+        for (let c = 1; c <= cols; c++) {
+          const seatId = rowLetter + c;
+          await setDoc(doc(db, "shows", showKey, "seats", seatId), {
+            taken: false,
+            reservedBy: null,
+            reservedAt: null
+          });
+        }
+      }
+    }
+
+    document.getElementById("preview").innerHTML = `
+      <p>✅ Event Created: ${escapeHtml(title)}</p>
+      <p>Total Showtimes: ${showtimes.length}</p>
+      <p><strong>Description:</strong> ${escapeHtml(description).slice(0, 200)}${description.length > 200 ? "..." : ""}</p>
+      ${imageUrl ? `<img src="${imageUrl}" alt="Poster">` : ""}
+      <p style="margin-top:10px;">
+        <a href="Play.html?event=${encodeURIComponent(eventId)}">➡️ Open in Play.html</a>
+      </p>
+    `;
+    alert("✅ Event successfully created!");
+  });
+
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+</script>
+
+</body>
+</html>

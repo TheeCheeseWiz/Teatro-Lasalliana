@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<style>
+
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Georgia, serif;
+  display: flex;
+  min-height: 100vh;
+  background: #dcdcdc;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 260px;
+  background: #f3df1f;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 20px;
+  justify-content: space-between;
+}
+
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.logo {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: black;
+}
+
+.logo span {
+  display: block;
+  font-size: 28px;
+}
+
+.sidebar a {
+  display: block;
+  background: #1e1e1e;
+  color: white;
+  text-decoration: none;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.sidebar a:hover {
+  background: #333;
+  transform: scale(1.03);
+}
+
+.sidebar-bottom {
+  text-align: center;
+  font-size: 12px;
+}
+
+.sidebar-bottom i {
+  font-size: 18px;
+  margin: 8px;
+  cursor: pointer;
+}
+
+/* ===== CONTENT ===== */
+.content {
+  flex: 1;
+  padding: 40px;
+}
+
+h1 {
+  font-size: 28px;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+
+/* ===== EVENT CARD ===== */
+.event-card {
+  margin-bottom: 15px;
+}
+
+.event-header {
+  background: #1e1e1e;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.event-header span {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.event-body {
+  display: none;
+  background: #ececec;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  padding: 6px;
+  font-weight: bold;
+}
+
+td {
+  padding: 6px;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+  text-align: right;
+}
+
+.summary {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.sold-out {
+  color: #c3080b;
+  font-weight: bold;
+}
+
+.seats-left {
+  color: #0b5d1e;
+  font-weight: bold;
+}
+
+/* ===== ANALYTICS SECTION ===== */
+.analytics-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.analytics-header h2 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.export-btn {
+  background: #1e1e1e;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: Georgia, serif;
+  font-size: 14px;
+  font-weight: bold;
+  transition: 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-btn:hover {
+  background: #333;
+  transform: translateY(-1px);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #f3df1f 0%, #f5e74d 100%);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.stat-card.revenue {
+  background: linear-gradient(135deg, #0b5d1e 0%, #0e7527 100%);
+  color: white;
+}
+
+.stat-card.seats {
+  background: linear-gradient(135deg, #1e1e1e 0%, #333 100%);
+  color: white;
+}
+
+.stat-card.events {
+  background: linear-gradient(135deg, #c3080b 0%, #e00a0e 100%);
+  color: white;
+}
+
+.stat-label {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.stat-subtitle {
+  font-size: 13px;
+  opacity: 0.75;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.chart-container {
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.chart-container h3 {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #1e1e1e;
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 300px;
+}
+
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo">
+      🎭
+      <span>Admin</span>
+      Dashboard
+    </div>
+
+    <div>
+      <a href="Admin.html">Dashboard</a>
+      <a href="ManageEvents.html">Manage Events</a>
+      <a href="History.html">Archive</a>
+      <a href="Transaction.html">Transactions</a>
+<a href="index.html">
+  <span style="margin-right:6px;">👁</span>Preview Site
+</a>
+    </div>
+  </div>
+
+  <div class="sidebar-bottom">
+    Follow TEATRO Lasalliana<br>
+    📷  👍
+  </div>
+</div>
+
+<div class="content">
+  <h1>Event Dashboard</h1>
+  
+  <!-- Analytics Section -->
+  <div class="analytics-section">
+    <div class="analytics-header">
+      <h2>📊 Analytics Overview</h2>
+      <button class="export-btn" id="exportDataBtn">
+        <span>📥</span> Export Report (CSV)
+      </button>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-card events">
+        <div class="stat-label">Total Events</div>
+        <div class="stat-value" id="totalEventsCount">0</div>
+        <div class="stat-subtitle">Active shows</div>
+      </div>
+      <div class="stat-card seats">
+        <div class="stat-label">Total Seats</div>
+        <div class="stat-value" id="totalSeatsCount">0</div>
+        <div class="stat-subtitle">Across all events</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Seats Sold</div>
+        <div class="stat-value" id="seatsSoldCount">0</div>
+        <div class="stat-subtitle" id="occupancyRate">0% occupancy</div>
+      </div>
+      <div class="stat-card revenue">
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-value" id="totalRevenueAmount">₱0</div>
+        <div class="stat-subtitle">From all bookings</div>
+      </div>
+    </div>
+    
+    <div class="charts-grid">
+      <div class="chart-container">
+        <h3>Seat Occupancy</h3>
+        <div class="chart-wrapper">
+          <canvas id="occupancyChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h3>Revenue by Event</h3>
+        <div class="chart-wrapper">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h3>Events by Status</h3>
+        <div class="chart-wrapper">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h3>Top Performing Events</h3>
+        <div class="chart-wrapper">
+          <canvas id="topEventsChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Latest Transactions -->
+  <section style="background:#fff;border-radius:16px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,0.08);margin-bottom:30px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <h3 style="margin:0;font-family:'Segoe UI',Arial,sans-serif;">Latest Transactions</h3>
+      <button id="refreshTxBtn" style="background:#111;color:#fff;border:none;padding:10px 12px;border-radius:10px;cursor:pointer;font-weight:700;">Refresh</button>
+    </div>
+    <div id="txAdminStatus" style="margin-top:8px;font-family:'Segoe UI',Arial,sans-serif;color:#666;">Loading…</div>
+    <div style="margin-top:10px;overflow:auto;">
+      <table style="width:100%;border-collapse:collapse;font-family:'Segoe UI',Arial,sans-serif;">
+        <thead>
+          <tr style="text-align:left;border-bottom:1px solid #eee;">
+            <th style="padding:10px;">Date</th>
+            <th style="padding:10px;">User</th>
+            <th style="padding:10px;">Action</th>
+            <th style="padding:10px;">Show</th>
+            <th style="padding:10px;">Seat</th>
+          </tr>
+        </thead>
+        <tbody id="txAdmin"></tbody>
+      </table>
+    </div>
+  </section>
+  
+  <h1>Event Details</h1>
+  <div id="eventsContainer"></div>
+</div>
+
+<script type="module">
+  import "./js/alerts.js"; // Custom alert system
+  import { db, auth } from "./js/firebase-config.js";
+  import { formatTime, formatDate, showErrorMessage, showLoading, createPagination, paginateArray } from "./js/utils.js";
+  import { COLLECTIONS, ROLES, TRANSACTIONS_PER_PAGE, EVENTS_PER_PAGE } from "./js/constants.js";
+  import {
+    collection, getDocs, doc, getDoc, deleteDoc, setDoc, serverTimestamp, query, orderBy, limit
+  } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  const eventsContainer = document.getElementById("eventsContainer");
+  let currentEventsPage = 1;
+  let allEventsData = [];
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      alert("⚠️ Please log in first.");
+      window.location.href = "Login.html";
+      return;
+    }
+
+    try {
+      const userSnap = await getDoc(doc(db, COLLECTIONS.USERS, user.uid));
+      if (!userSnap.exists() || userSnap.data().role !== ROLES.ADMIN) {
+        alert("🚫 Access denied. Admin only.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      loadEvents(user.uid);
+      loadLatestTransactions();
+    } catch (error) {
+      showErrorMessage(error, "admin verification");
+      window.location.href = "Login.html";
+    }
+  });
+
+  async function renderEventsPage(page, adminId) {
+    currentEventsPage = page;
+    const paginated = paginateArray(allEventsData, page, EVENTS_PER_PAGE);
+    
+    eventsContainer.innerHTML = "";
+    
+    if (paginated.items.length === 0) {
+      eventsContainer.innerHTML = `<div style="text-align:center;padding:20px;">No events on this page.</div>`;
+      return;
+    }
+
+    for (const { docSnap, data, eventId, showCount } of paginated.items) {
+      let totalSeats = 0, totalTaken = 0, totalProfit = 0;
+
+      // Create event card
+      const card = document.createElement("div");
+      card.className = "event-card";
+
+      const header = document.createElement("div");
+      header.className = "event-header";
+      header.innerHTML = `
+        <div>${data.title} <span>(${data.venue})</span></div>
+        <span>₱${data.price} • ${showCount} shows</span>
+      `;
+
+      const body = document.createElement("div");
+      body.className = "event-body";
+
+      const table = document.createElement("table");
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Showtime</th>
+            <th>Total Seats</th>
+            <th>Taken</th>
+            <th>Seats Left</th>
+            <th>Profit</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+
+      const tbody = table.querySelector("tbody");
+
+      // For each showtime, compute seat info
+      for (let i = 0; i < showCount; i++) {
+        const st = data.showtimes[i];
+        const showKey = `${eventId}_show${i + 1}`;
+        const seatsSnap = await getDocs(collection(db, COLLECTIONS.SHOWS, showKey, "seats"));
+        let seats = 0, taken = 0;
+
+        seatsSnap.forEach(seatDoc => {
+          seats++;
+          if (seatDoc.data().taken) taken++;
+        });
+
+        const profit = taken * (data.price || 0);
+        const seatsLeft = seats - taken;
+        const statusText = seatsLeft <= 0 ? "Sold Out" : `${seatsLeft} Left`;
+
+        totalSeats += seats;
+        totalTaken += taken;
+        totalProfit += profit;
+
+        const date = new Date(st.date);
+        const formattedDate = date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric"
+        });
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${formattedDate} — ${formatTime(st.start)}–${formatTime(st.end)}</td>
+          <td>${seats}</td>
+          <td>${taken}</td>
+          <td>${seatsLeft}</td>
+          <td>₱${profit}</td>
+          <td class="${seatsLeft <= 0 ? 'sold-out' : 'seats-left'}">${statusText}</td>
+        `;
+        tbody.appendChild(row);
+      }
+
+      const summary = document.createElement("p");
+      summary.className = "summary";
+      summary.innerHTML = `
+        <strong>Total Seats:</strong> ${totalSeats} |
+        <strong>Taken:</strong> ${totalTaken} |
+        <strong>Seats Left:</strong> ${totalSeats - totalTaken} |
+        <strong>Profit:</strong> ₱${totalProfit}
+      `;
+
+      body.appendChild(table);
+      body.appendChild(summary);
+      card.appendChild(header);
+      card.appendChild(body);
+      eventsContainer.appendChild(card);
+
+      header.addEventListener("click", () => {
+        body.style.display = body.style.display === "block" ? "none" : "block";
+      });
+    }
+    
+    // Add pagination controls
+    const paginationContainer = createPagination(paginated.currentPage, paginated.totalPages, (newPage) => renderEventsPage(newPage, adminId));
+    eventsContainer.appendChild(paginationContainer);
+    
+    // Scroll to top
+    eventsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Analytics data storage
+  let analyticsData = {
+    totalEvents: 0,
+    totalSeats: 0,
+    seatsSold: 0,
+    totalRevenue: 0,
+    eventStats: [],
+    statusBreakdown: { soldOut: 0, available: 0, almostFull: 0 }
+  };
+
+  let charts = {};
+
+  async function loadEvents(adminId) {
+    showLoading(eventsContainer, "Loading events...");
+    
+    try {
+      const eventsSnap = await getDocs(collection(db, COLLECTIONS.EVENTS));
+      
+      // Store all events data
+      allEventsData = [];
+      analyticsData = {
+        totalEvents: 0,
+        totalSeats: 0,
+        seatsSold: 0,
+        totalRevenue: 0,
+        eventStats: [],
+        statusBreakdown: { soldOut: 0, available: 0, almostFull: 0 }
+      };
+      for (const docSnap of eventsSnap.docs) {
+        const data = docSnap.data();
+        if (data.deletedAt) continue;
+        const eventId = docSnap.id;
+        const showCount = data.showtimes?.length || 0;
+        
+        // Calculate analytics for this event
+        let eventTotalSeats = 0;
+        let eventTakenSeats = 0;
+        
+        for (let i = 0; i < showCount; i++) {
+          const showKey = `${eventId}_show${i + 1}`;
+          const seatsSnap = await getDocs(collection(db, COLLECTIONS.SHOWS, showKey, "seats"));
+          
+          seatsSnap.forEach(seatDoc => {
+            eventTotalSeats++;
+            if (seatDoc.data().taken) eventTakenSeats++;
+          });
+        }
+        
+        const eventRevenue = eventTakenSeats * (data.price || 0);
+        const occupancyPercent = eventTotalSeats > 0 ? (eventTakenSeats / eventTotalSeats) * 100 : 0;
+        
+        // Update analytics
+        analyticsData.totalSeats += eventTotalSeats;
+        analyticsData.seatsSold += eventTakenSeats;
+        analyticsData.totalRevenue += eventRevenue;
+        analyticsData.totalEvents++;
+        
+        // Track event status
+        if (occupancyPercent === 100) {
+          analyticsData.statusBreakdown.soldOut++;
+        } else if (occupancyPercent >= 75) {
+          analyticsData.statusBreakdown.almostFull++;
+        } else {
+          analyticsData.statusBreakdown.available++;
+        }
+        
+        analyticsData.eventStats.push({
+          title: data.title || eventId,
+          totalSeats: eventTotalSeats,
+          takenSeats: eventTakenSeats,
+          revenue: eventRevenue,
+          occupancy: occupancyPercent
+        });
+        
+        allEventsData.push({ docSnap, data, eventId, showCount });
+      }
+      
+      // Update analytics UI
+      updateAnalytics();
+      
+      // Render first page
+      renderEventsPage(1, adminId);
+    } catch (error) {
+      showErrorMessage(error, "loading events");
+      eventsContainer.innerHTML = `<div style="text-align:center;padding:20px;">Failed to load events.</div>`;
+    }
+  }
+
+
+  async function deleteEvent(eventId, adminId) {
+    if (!confirm("Are you sure you want to archive this event?")) return;
+
+    try {
+      const eventRef = doc(db, COLLECTIONS.EVENTS, eventId);
+      const snap = await getDoc(eventRef);
+      if (!snap.exists()) {
+        alert("Event not found.");
+        return;
+      }
+
+    const data = snap.data();
+    const showCount = data.showtimes?.length || 0;
+    let totalSeats = 0, takenSeats = 0;
+
+    for (let i = 1; i <= showCount; i++) {
+      const showKey = `${eventId}_show${i}`;
+      const seatsSnap = await getDocs(collection(db, "shows", showKey, "seats"));
+      for (const seatDoc of seatsSnap.docs) {
+        const seatData = seatDoc.data();
+        totalSeats++;
+        if (seatData.taken) takenSeats++;
+        await setDoc(doc(db, COLLECTIONS.HISTORY, eventId, "shows", showKey, "seats", seatDoc.id), seatData);
+      }
+    }
+
+    const profit = takenSeats * (data.price || 0);
+
+      await setDoc(doc(db, COLLECTIONS.HISTORY, eventId), {
+        ...data,
+        deletedAt: serverTimestamp(),
+        deletedBy: adminId,
+        totalSeats,
+        takenSeats,
+        profit
+      });
+
+      await deleteDoc(eventRef);
+      alert(`✅ Event "${data.title}" archived to history.`);
+      loadEvents(adminId);
+    } catch (error) {
+      showErrorMessage(error, "archiving event");
+    }
+  }
+
+  // Admin: load latest transactions
+  const txAdminBody = document.getElementById("txAdmin");
+  const txAdminStatus = document.getElementById("txAdminStatus");
+  const refreshTxBtn = document.getElementById("refreshTxBtn");
+  let currentAdminTxPage = 1;
+  let allAdminTransactions = [];
+
+  function renderAdminTransactionsPage(page) {
+    currentAdminTxPage = page;
+    const paginated = paginateArray(allAdminTransactions, page, TRANSACTIONS_PER_PAGE);
+    
+    txAdminBody.innerHTML = "";
+    
+    if (paginated.items.length === 0) {
+      txAdminStatus.textContent = "No transactions on this page.";
+      return;
+    }
+    
+    txAdminStatus.textContent = `Showing ${paginated.items.length} of ${paginated.totalItems} transactions (Page ${paginated.currentPage}/${paginated.totalPages})`;
+
+    paginated.items.forEach((t) => {
+      const tr = document.createElement("tr");
+      tr.style.borderBottom = "1px solid #f0f0f0";
+
+      const date = t.createdAt?.toDate?.() ? t.createdAt.toDate().toLocaleString() : "";
+      const action = (t.action || "").toUpperCase();
+      tr.innerHTML = `
+        <td style="padding:10px;white-space:nowrap;">${date}</td>
+        <td style="padding:10px;">${t.userEmail || t.userId || ""}</td>
+        <td style="padding:10px;font-weight:800;">${action}</td>
+        <td style="padding:10px;">${t.showKey || ""}</td>
+        <td style="padding:10px;font-weight:800;">${t.seatId || ""}</td>
+      `;
+      txAdminBody.appendChild(tr);
+    });
+    
+    // Add pagination controls
+    const existingPagination = document.getElementById('adminTxPagination');
+    if (existingPagination) existingPagination.remove();
+    
+    const paginationContainer = createPagination(paginated.currentPage, paginated.totalPages, renderAdminTransactionsPage);
+    paginationContainer.id = 'adminTxPagination';
+    paginationContainer.style.marginTop = '16px';
+    txAdminBody.parentElement.parentElement.appendChild(paginationContainer);
+  }
+
+  async function loadLatestTransactions() {
+    if (!txAdminBody || !txAdminStatus) return;
+
+    txAdminStatus.textContent = "Loading…";
+    txAdminBody.innerHTML = "";
+    
+    // Remove existing pagination
+    const existingPagination = document.getElementById('adminTxPagination');
+    if (existingPagination) existingPagination.remove();
+
+    try {
+      const qy = query(collection(db, COLLECTIONS.TRANSACTIONS), orderBy("createdAt", "desc"));
+      const snap = await getDocs(qy);
+
+      if (snap.empty) {
+        txAdminStatus.textContent = "No transactions yet.";
+        return;
+      }
+      
+      // Store all transactions
+      allAdminTransactions = [];
+      snap.forEach((d) => {
+        allAdminTransactions.push(d.data());
+      });
+      
+      // Render first page
+      renderAdminTransactionsPage(1);
+    } catch (error) {
+      showErrorMessage(error, "loading transactions");
+      txAdminStatus.textContent = "Failed to load transactions.";
+    }
+  }
+
+  refreshTxBtn?.addEventListener("click", () => loadLatestTransactions());
+
+  // ===== ANALYTICS FUNCTIONS =====
+  
+  function updateAnalytics() {
+    // Update stat cards
+    document.getElementById('totalEventsCount').textContent = analyticsData.totalEvents;
+    document.getElementById('totalSeatsCount').textContent = analyticsData.totalSeats.toLocaleString();
+    document.getElementById('seatsSoldCount').textContent = analyticsData.seatsSold.toLocaleString();
+    document.getElementById('totalRevenueAmount').textContent = `₱${analyticsData.totalRevenue.toLocaleString()}`;
+    
+    const occupancyRate = analyticsData.totalSeats > 0 
+      ? ((analyticsData.seatsSold / analyticsData.totalSeats) * 100).toFixed(1)
+      : 0;
+    document.getElementById('occupancyRate').textContent = `${occupancyRate}% occupancy`;
+    
+    // Create charts
+    createCharts();
+  }
+  
+  function createCharts() {
+    // Destroy existing charts
+    Object.values(charts).forEach(chart => chart?.destroy());
+    
+    // 1. Seat Occupancy Pie Chart
+    const occupancyCtx = document.getElementById('occupancyChart').getContext('2d');
+    charts.occupancy = new Chart(occupancyCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Seats Sold', 'Available Seats'],
+        datasets: [{
+          data: [analyticsData.seatsSold, analyticsData.totalSeats - analyticsData.seatsSold],
+          backgroundColor: ['#0b5d1e', '#f3df1f'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: (context) => {
+                const label = context.label || '';
+                const value = context.parsed || 0;
+                const total = analyticsData.totalSeats;
+                const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                return `${label}: ${value.toLocaleString()} (${percent}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+    
+    // 2. Revenue by Event Bar Chart
+    const topEvents = [...analyticsData.eventStats]
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+    
+    const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+    charts.revenue = new Chart(revenueCtx, {
+      type: 'bar',
+      data: {
+        labels: topEvents.map(e => e.title.substring(0, 20)),
+        datasets: [{
+          label: 'Revenue (₱)',
+          data: topEvents.map(e => e.revenue),
+          backgroundColor: '#0b5d1e',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: (value) => '₱' + value.toLocaleString()
+            }
+          }
+        }
+      }
+    });
+    
+    // 3. Events by Status Pie Chart
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    charts.status = new Chart(statusCtx, {
+      type: 'pie',
+      data: {
+        labels: ['Sold Out', 'Almost Full (75%+)', 'Available'],
+        datasets: [{
+          data: [
+            analyticsData.statusBreakdown.soldOut,
+            analyticsData.statusBreakdown.almostFull,
+            analyticsData.statusBreakdown.available
+          ],
+          backgroundColor: ['#c3080b', '#f5e74d', '#0b5d1e'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+    
+    // 4. Top Performing Events (by occupancy)
+    const topPerforming = [...analyticsData.eventStats]
+      .filter(e => e.totalSeats > 0)
+      .sort((a, b) => b.occupancy - a.occupancy)
+      .slice(0, 5);
+    
+    const topEventsCtx = document.getElementById('topEventsChart').getContext('2d');
+    charts.topEvents = new Chart(topEventsCtx, {
+      type: 'bar',
+      data: {
+        labels: topPerforming.map(e => e.title.substring(0, 15)),
+        datasets: [{
+          label: 'Occupancy %',
+          data: topPerforming.map(e => e.occupancy),
+          backgroundColor: '#f3df1f',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              callback: (value) => value + '%'
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  // ===== CSV EXPORT FUNCTION =====
+  
+  function exportToCSV() {
+    const timestamp = new Date().toISOString().split('T')[0];
+    const dateTime = new Date().toLocaleString('en-US', { 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    // Helper function to format currency
+    const formatCurrency = (amount) => `PHP ${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    
+    // Helper function to format numbers
+    const formatNumber = (num) => num.toLocaleString('en-US');
+    
+    // UTF-8 BOM for proper Excel encoding
+    let csvContent = "\uFEFF";
+    
+    // Professional Header
+    csvContent += "==============================================\n";
+    csvContent += "TEATRO LASALLIANA\n";
+    csvContent += "ADMINISTRATIVE REPORT\n";
+    csvContent += "==============================================\n";
+    csvContent += `Report Generated: ${dateTime}\n`;
+    csvContent += `Report Period: As of ${timestamp}\n`;
+    csvContent += "==============================================\n\n";
+    
+    // Executive Summary
+    csvContent += "EXECUTIVE SUMMARY\n";
+    csvContent += "----------------------------------------------\n";
+    const occupancyRate = analyticsData.totalSeats > 0 
+      ? ((analyticsData.seatsSold / analyticsData.totalSeats) * 100).toFixed(2)
+      : 0;
+    csvContent += `Total Active Events:,${analyticsData.totalEvents}\n`;
+    csvContent += `Total Seat Capacity:,${formatNumber(analyticsData.totalSeats)}\n`;
+    csvContent += `Total Seats Sold:,${formatNumber(analyticsData.seatsSold)}\n`;
+    csvContent += `Available Seats:,${formatNumber(analyticsData.totalSeats - analyticsData.seatsSold)}\n`;
+    csvContent += `Overall Occupancy Rate:,${occupancyRate}%\n`;
+    csvContent += `Total Revenue Generated:,${formatCurrency(analyticsData.totalRevenue)}\n`;
+    csvContent += `Average Revenue per Event:,${formatCurrency(analyticsData.totalEvents > 0 ? analyticsData.totalRevenue / analyticsData.totalEvents : 0)}\n`;
+    csvContent += `\n`;
+    
+    // Event Performance Details
+    csvContent += "EVENT PERFORMANCE BREAKDOWN\n";
+    csvContent += "----------------------------------------------\n";
+    csvContent += "Event Title,Total Seats,Seats Sold,Available Seats,Occupancy Rate,Revenue (PHP),Status\n";
+    
+    analyticsData.eventStats.forEach(event => {
+      const available = event.totalSeats - event.takenSeats;
+      const status = event.occupancy === 100 ? 'SOLD OUT' : 
+                     event.occupancy >= 75 ? 'ALMOST FULL' : 
+                     'AVAILABLE';
+      const revenue = event.revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      
+      csvContent += `"${event.title}",${event.totalSeats},${event.takenSeats},${available},${event.occupancy.toFixed(2)}%,${revenue},${status}\n`;
+    });
+    
+    csvContent += `\n`;
+    
+    // Status Distribution
+    csvContent += "EVENT STATUS DISTRIBUTION\n";
+    csvContent += "----------------------------------------------\n";
+    csvContent += "Status Category,Number of Events,Percentage\n";
+    const total = analyticsData.statusBreakdown.soldOut + analyticsData.statusBreakdown.almostFull + analyticsData.statusBreakdown.available;
+    const soldOutPct = total > 0 ? ((analyticsData.statusBreakdown.soldOut / total) * 100).toFixed(1) : 0;
+    const almostFullPct = total > 0 ? ((analyticsData.statusBreakdown.almostFull / total) * 100).toFixed(1) : 0;
+    const availablePct = total > 0 ? ((analyticsData.statusBreakdown.available / total) * 100).toFixed(1) : 0;
+    
+    csvContent += `Sold Out Events,${analyticsData.statusBreakdown.soldOut},${soldOutPct}%\n`;
+    csvContent += `Almost Full Events (75%+),${analyticsData.statusBreakdown.almostFull},${almostFullPct}%\n`;
+    csvContent += `Available Events,${analyticsData.statusBreakdown.available},${availablePct}%\n`;
+    csvContent += `\n`;
+    
+    // Top Performers
+    csvContent += "TOP PERFORMING EVENTS\n";
+    csvContent += "----------------------------------------------\n";
+    const topByRevenue = [...analyticsData.eventStats]
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 5);
+    
+    csvContent += "By Revenue:\n";
+    csvContent += "Rank,Event Title,Revenue (PHP),Seats Sold\n";
+    topByRevenue.forEach((event, index) => {
+      const revenue = event.revenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      csvContent += `${index + 1},"${event.title}",${revenue},${event.takenSeats}\n`;
+    });
+    
+    csvContent += `\n`;
+    
+    const topByOccupancy = [...analyticsData.eventStats]
+      .filter(e => e.totalSeats > 0)
+      .sort((a, b) => b.occupancy - a.occupancy)
+      .slice(0, 5);
+    
+    csvContent += "By Occupancy Rate:\n";
+    csvContent += "Rank,Event Title,Occupancy Rate,Seats Sold / Total\n";
+    topByOccupancy.forEach((event, index) => {
+      csvContent += `${index + 1},"${event.title}",${event.occupancy.toFixed(2)}%,"${event.takenSeats} / ${event.totalSeats}"\n`;
+    });
+    
+    csvContent += `\n`;
+    csvContent += "==============================================\n";
+    csvContent += "END OF REPORT\n";
+    csvContent += "==============================================\n";
+    
+    // Create download with UTF-8 BOM
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `Teatro-Admin-Report-${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    alert('✅ Professional report exported successfully!');
+  }
+  
+  document.getElementById('exportDataBtn')?.addEventListener('click', exportToCSV);
+  
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Events</title>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, serif;
+      display: flex;
+      min-height: 100vh;
+      background: #dcdcdc;
+      color: #111;
+    }
+
+    /* ===== SIDEBAR ===== */
+    .sidebar {
+      width: 260px;
+      background: #f3df1f;
+      display: flex;
+      flex-direction: column;
+      padding: 30px 20px;
+      justify-content: space-between;
+    }
+
+    .sidebar-top {
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      color: black;
+    }
+
+    .logo span {
+      display: block;
+      font-size: 28px;
+    }
+
+    .sidebar a {
+      display: block;
+      background: #1e1e1e;
+      color: white;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    .sidebar a:hover {
+      background: #333;
+      transform: scale(1.03);
+    }
+
+    .sidebar-bottom {
+      text-align: center;
+      font-size: 12px;
+    }
+
+    /* ===== CONTENT ===== */
+    .content {
+      flex: 1;
+      padding: 40px;
+      overflow-x: auto;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 18px;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+      margin-bottom: 22px;
+    }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .tab-btn {
+      background: #111;
+      color: #fff;
+      border: none;
+      padding: 12px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    .tab-btn.active {
+      background: #f3df1f;
+      color: #111;
+      font-weight: bold;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .tab-panel {
+      display: none;
+      background: #efefef;
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.12);
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
+
+    /* ===== FORM ===== */
+    .form-wrap {
+      max-width: 850px;
+    }
+
+    .form-title {
+      font-size: 22px;
+      margin-bottom: 16px;
+      font-weight: bold;
+    }
+
+    label {
+      display: block;
+      margin: 12px 0 5px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #bbb;
+      font-family: Georgia, serif;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #111;
+    }
+
+    .date-group {
+      background: #ffffff;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .time-group {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .time-group input {
+      width: 220px;
+      max-width: 100%;
+      display: inline-block;
+    }
+
+    .mini-btn, .main-btn, .danger-btn, .archive-btn {
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      font-family: Georgia, serif;
+    }
+
+    .mini-btn {
+      background: #1e1e1e;
+      color: white;
+      padding: 8px 12px;
+      margin-top: 8px;
+    }
+
+    .mini-btn:hover {
+      background: #333;
+    }
+
+    .main-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .main-btn {
+      background: #111;
+      color: white;
+      padding: 12px 16px;
+      font-weight: bold;
+    }
+
+    .main-btn:hover {
+      background: #333;
+      transform: scale(1.02);
+    }
+
+    .danger-btn, .archive-btn {
+      background: #111;
+      color: white;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+
+    .danger-btn:hover, .archive-btn:hover {
+      background: #c3080b;
+      transform: scale(1.04);
+    }
+
+    .helper {
+      font-size: 12px;
+      color: rgba(0,0,0,0.65);
+      margin-top: 6px;
+    }
+
+    #createPreview, #editPreview {
+      margin-top: 18px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    #createPreview img, #editPreview img {
+      max-width: 220px;
+      margin-top: 10px;
+      border-radius: 10px;
+    }
+
+    /* ===== RECENT SHOWS ===== */
+    .event-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .event-card {
+      background: #fafafa;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .event-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+
+    .event-title {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .event-venue {
+      font-size: 13px;
+      color: rgba(0,0,0,0.65);
+    }
+
+    .event-meta {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 10px 0 8px;
+      font-size: 14px;
+    }
+
+    .event-description {
+      margin: 10px 0 12px;
+      line-height: 1.6;
+      color: rgba(0,0,0,0.85);
+      white-space: pre-wrap;
+    }
+
+    .event-poster {
+      max-width: 220px;
+      border-radius: 12px;
+      margin-top: 10px;
+    }
+
+    .showtime-table-wrap {
+      overflow-x: auto;
+      margin-top: 12px;
+    }
+
+    .showtime-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 780px;
+      font-size: 14px;
+    }
+
+    .showtime-table th,
+    .showtime-table td {
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .showtime-table thead {
+      background: #111;
+      color: #fff;
+    }
+
+    .sold-out {
+      color: #c3080b;
+      font-weight: bold;
+    }
+
+    .seats-left {
+      color: #0b5d1e;
+      font-weight: bold;
+    }
+
+    .empty-state {
+      padding: 24px;
+      font-size: 14px;
+      color: rgba(0,0,0,0.65);
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; min-height: auto; }
+      .content { padding: 18px; }
+      .time-group input { width: 100%; }
+    }
+
+    .modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
+  width: 320px;
+  text-align: center;
+}
+
+.modal-box input {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+}
+
+.modal-actions {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-actions button {
+  flex: 1; /* Makes buttons equal width */
+  margin: 0 5px;
+  padding: 12px;
+  font-weight: bold;
+  border-radius: 10px;
+  border: none;
+  font-family: Georgia, serif;
+  transition: 0.2s;
+}
+
+#cancelPasswordBtn {
+  background: #111;
+  color: white;
+}
+
+#cancelPasswordBtn:hover {
+  background: #333;
+}
+
+#confirmPasswordBtn {
+  background: #f3df1f; /* Teatro Yellow */
+  color: #111;
+}
+
+#confirmPasswordBtn:hover {
+  filter: brightness(0.9);
+  transform: scale(1.02);
+}
+
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-top">
+    <div class="logo">
+      🎭
+      <span>Manage</span>
+      Events
+    </div>
+
+    <div>
+      <a href="Admin.html">Dashboard</a>
+      <a href="ManageEvents.html">Manage Events</a>
+      <a href="History.html">Archive</a>
+      <a href="Transaction.html">Transactions</a>
+<a href="index.html">
+  <span style="margin-right:6px;">👁</span>Preview Site
+</a>
+    </div>
+  </div>
+
+  <div class="sidebar-bottom">
+    Follow TEATRO Lasalliana<br>
+    📷 👍
+  </div>
+</div>
+
+<div class="content">
+  <h1>Manage Events</h1>
+  <div class="subtitle">Create, update, and archive your theatre events in one page.</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="addTab">Add Show</button>
+    <button class="tab-btn" data-tab="editTab">Edit Show</button>
+    <button class="tab-btn" data-tab="recentTab">Recent Shows</button>
+  </div>
+
+  <!-- ADD SHOW -->
+  <section class="tab-panel active" id="addTab">
+    <div class="form-wrap">
+      <div class="form-title">Add Show</div>
+
+      <form id="createEventForm">
+        <label>Event Title</label>
+        <input type="text" id="createEventTitle" required>
+
+        <label>Venue</label>
+        <input type="text" id="createEventVenue" required>
+
+        <label>Price (₱)</label>
+        <input type="number" id="createEventPrice" required>
+
+        <label>Image URL (Poster)</label>
+        <input type="url" id="createEventImageUrl" placeholder="https://example.com/poster.jpg">
+
+        <label>Description</label>
+        <textarea id="createEventDescription" placeholder="Write the play description here..." required></textarea>
+
+        <label>Duration (minutes) (optional)</label>
+        <input type="number" id="createEventDuration" placeholder="e.g. 140">
+
+        <label>Age Rating (optional)</label>
+        <input type="text" id="createEventAgeRating" placeholder="e.g. 14+">
+
+        <h3 style="margin-top:20px;">Show Dates & Times</h3>
+        <div id="createDatesContainer"></div>
+
+        <div class="main-actions">
+          <button type="button" class="main-btn" id="createAddDateBtn">➕ Add Day</button>
+          <button type="submit" class="main-btn">💾 Save Event</button>
+        </div>
+      </form>
+
+      <div id="createPreview"></div>
+    </div>
+  </section>
+
+  <!-- EDIT SHOW -->
+  <section class="tab-panel" id="editTab">
+    <div class="form-wrap">
+      <div class="form-title">Edit Show</div>
+
+      <label>Select Event</label>
+      <select id="editEventSelect">
+        <option value="">Loading events...</option>
+      </select>
+      <div class="helper">Pick an event first, then edit the details below.</div>
+
+      <form id="editEventForm" style="margin-top:18px;">
+        <label>Event Title</label>
+        <input type="text" id="editEventTitle" required>
+
+        <label>Venue</label>
+        <input type="text" id="editEventVenue" required>
+
+        <label>Price (₱)</label>
+        <input type="number" id="editEventPrice" required>
+
+        <label>Image URL (Poster)</label>
+        <input type="url" id="editEventImageUrl" placeholder="https://example.com/poster.jpg">
+
+        <label>Description</label>
+        <textarea id="editEventDescription" placeholder="Write the play description here..." required></textarea>
+
+        <label>Duration (minutes) (optional)</label>
+        <input type="number" id="editEventDuration" placeholder="e.g. 140">
+
+        <label>Age Rating (optional)</label>
+        <input type="text" id="editEventAgeRating" placeholder="e.g. 14+">
+
+        <h3 style="margin-top:20px;">Show Dates & Times</h3>
+        <div id="editDatesContainer"></div>
+
+        <div class="main-actions">
+          <button type="button" class="main-btn" id="editAddDateBtn">➕ Add Day</button>
+          <button type="submit" class="main-btn">💾 Update Event</button>
+        </div>
+      </form>
+
+      <div id="editPreview"></div>
+    </div>
+  </section>
+
+  <!-- RECENT SHOWS -->
+  <section class="tab-panel" id="recentTab">
+    <div class="form-title">Recent Shows</div>
+    <div class="helper" style="margin-bottom:16px;">View all event details and archive finished shows.</div>
+    <div class="event-list" id="recentEventsContainer">
+      <div class="empty-state">Loading events...</div>
+    </div>
+  </section>
+</div>
+
+<div id="passwordModal" class="modal hidden">
+  <div class="modal-box">
+    <h3>🔒 Confirm Archive</h3>
+    <p>Enter your password to continue</p>
+
+    <input type="password" id="passwordInput" placeholder="Password">
+
+    <div class="modal-actions">
+      <button id="cancelPasswordBtn">Cancel</button>
+      <button id="confirmPasswordBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc, getDocs, collection, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+  import { getAuth,  onAuthStateChanged,  EmailAuthProvider, reauthenticateWithCredential } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCA212oYhwdJjb4aLMCWOIJXb2xRwzQylc",
+    authDomain: "teatrocapstone.firebaseapp.com",
+    projectId: "teatrocapstone",
+    storageBucket: "teatrocapstone.appspot.com",
+    messagingSenderId: "434560617971",
+    appId: "1:434560617971:web:47a8f9c132d014f4429686",
+    measurementId: "G-W6221CLGNG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  let currentAdminId = null;
+  let loadedEventsMap = new Map();
+
+  // ===== TAB LOGIC =====
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.tab).classList.add("active");
+    });
+  });
+
+  // ===== ADMIN CHECK =====
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      alert("⚠️ Please log in as admin first.");
+      window.location.href = "Login.html";
+      return;
+    }
+
+    try {
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+      if (!userSnap.exists() || userSnap.data().role !== "admin") {
+        alert("🚫 Access denied. Admin only.");
+        window.location.href = "index.html";
+        return;
+      }
+
+      currentAdminId = user.uid;
+      await refreshAllEventViews();
+    } catch (e) {
+      console.error("Admin check failed:", e);
+      alert("⚠️ Unable to verify admin access. Please try again.");
+      window.location.href = "index.html";
+    }
+  });
+
+  // ===== HELPERS =====
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function formatTime(timeStr) {
+    if (!timeStr) return "";
+    const [h, m] = timeStr.split(":");
+    const date = new Date();
+    date.setHours(h, m);
+    return date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return dateStr;
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  }
+
+  function createDateGroupHTML(prefix, dateValue = "") {
+    const dateDiv = document.createElement("div");
+    dateDiv.classList.add("date-group");
+    dateDiv.innerHTML = `
+      <label>📅 Select Date:</label>
+      <input type="date" class="${prefix}EventDate" value="${escapeAttr(dateValue)}" required>
+      <div class="${prefix}TimesContainer"></div>
+      <button type="button" class="mini-btn ${prefix}AddTimeBtn">Add Showtime</button>
+    `;
+
+    const addTimeBtn = dateDiv.querySelector(`.${prefix}AddTimeBtn`);
+    addTimeBtn.addEventListener("click", () => {
+      const timesDiv = dateDiv.querySelector(`.${prefix}TimesContainer`);
+      const timeGroup = createTimeGroupHTML(prefix, "", "");
+      timesDiv.appendChild(timeGroup);
+    });
+
+    return dateDiv;
+  }
+
+  function createTimeGroupHTML(prefix, startValue = "", endValue = "") {
+    const timeGroup = document.createElement("div");
+    timeGroup.classList.add("time-group");
+    timeGroup.innerHTML = `
+      <input type="time" class="${prefix}StartTime" value="${escapeAttr(startValue)}" required>
+      <span>to</span>
+      <input type="time" class="${prefix}EndTime" value="${escapeAttr(endValue)}" required>
+      <button type="button" class="mini-btn ${prefix}RemoveTimeBtn">❌</button>
+    `;
+
+    timeGroup.querySelector(`.${prefix}RemoveTimeBtn`).addEventListener("click", () => timeGroup.remove());
+    return timeGroup;
+  }
+
+  function escapeAttr(str) {
+    return String(str || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
+  }
+
+  function collectShowtimes(prefix, datesContainerId) {
+    const showtimes = [];
+    const dateGroups = document.querySelectorAll(`#${datesContainerId} .date-group`);
+
+    dateGroups.forEach(dateGroup => {
+      const date = dateGroup.querySelector(`.${prefix}EventDate`).value;
+      const timeGroups = dateGroup.querySelectorAll(".time-group");
+
+      timeGroups.forEach(timeGroup => {
+        const start = timeGroup.querySelector(`.${prefix}StartTime`).value;
+        const end = timeGroup.querySelector(`.${prefix}EndTime`).value;
+        if (date && start && end) showtimes.push({ date, start, end });
+      });
+    });
+
+    return showtimes;
+  }
+
+  async function ensureSeatMaps(eventId, showtimes) {
+    const rows = 5, cols = 10;
+
+    for (let i = 0; i < showtimes.length; i++) {
+      const showKey = `${eventId}_show${i + 1}`;
+
+      for (let r = 0; r < rows; r++) {
+        const rowLetter = String.fromCharCode(65 + r);
+        for (let c = 1; c <= cols; c++) {
+          const seatId = rowLetter + c;
+          const seatRef = doc(db, "shows", showKey, "seats", seatId);
+          const seatSnap = await getDoc(seatRef);
+
+          if (!seatSnap.exists()) {
+            await setDoc(seatRef, {
+              taken: false,
+              reservedBy: null,
+              reservedAt: null
+            });
+          }
+        }
+      }
+    }
+  }
+
+  async function refreshAllEventViews() {
+    await loadEventOptionsForEdit();
+    await loadRecentShows();
+  }
+
+  // ===== ADD SHOW =====
+  const createDatesContainer = document.getElementById("createDatesContainer");
+  const createAddDateBtn = document.getElementById("createAddDateBtn");
+  const createPreview = document.getElementById("createPreview");
+
+  createAddDateBtn.addEventListener("click", () => {
+    createDatesContainer.appendChild(createDateGroupHTML("create", ""));
+  });
+
+  document.getElementById("createEventForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById("createEventTitle").value.trim();
+    const venue = document.getElementById("createEventVenue").value.trim();
+    const price = parseFloat(document.getElementById("createEventPrice").value.trim());
+    const imageUrl = document.getElementById("createEventImageUrl").value.trim();
+    const description = document.getElementById("createEventDescription").value.trim();
+    const durationVal = document.getElementById("createEventDuration").value.trim();
+    const ageRatingVal = document.getElementById("createEventAgeRating").value.trim();
+
+    const eventId = title.toLowerCase().replace(/\s+/g, "-");
+    const showtimes = collectShowtimes("create", "createDatesContainer");
+
+    if (!showtimes.length) {
+      alert("⚠️ Please add at least one date and showtime.");
+      return;
+    }
+
+    if (!description) {
+      alert("⚠️ Please add a description.");
+      return;
+    }
+
+    await setDoc(doc(db, "events", eventId), {
+      title,
+      venue,
+      price,
+      imageUrl,
+      description,
+      duration: durationVal ? Number(durationVal) : null,
+      ageRating: ageRatingVal ? ageRatingVal : null,
+      showtimes
+    });
+
+    await ensureSeatMaps(eventId, showtimes);
+
+    createPreview.innerHTML = `
+      <p>✅ Event Created: ${escapeHtml(title)}</p>
+      <p>Total Showtimes: ${showtimes.length}</p>
+      <p><strong>Description:</strong> ${escapeHtml(description).slice(0, 200)}${description.length > 200 ? "..." : ""}</p>
+      ${imageUrl ? `<img src="${imageUrl}" alt="Poster">` : ""}
+      <p style="margin-top:10px;">
+        <a href="Play.html?event=${encodeURIComponent(eventId)}">➡️ Open in Play.html</a>
+      </p>
+    `;
+
+    alert("✅ Event successfully created!");
+    document.getElementById("createEventForm").reset();
+    createDatesContainer.innerHTML = "";
+    await refreshAllEventViews();
+  });
+
+  // ===== EDIT SHOW =====
+  const editEventSelect = document.getElementById("editEventSelect");
+  const editDatesContainer = document.getElementById("editDatesContainer");
+  const editAddDateBtn = document.getElementById("editAddDateBtn");
+  const editPreview = document.getElementById("editPreview");
+
+  editAddDateBtn.addEventListener("click", () => {
+    editDatesContainer.appendChild(createDateGroupHTML("edit", ""));
+  });
+
+  async function loadEventOptionsForEdit() {
+    const snapshot = await getDocs(collection(db, "events"));
+    loadedEventsMap.clear();
+
+    editEventSelect.innerHTML = `<option value="">Select an event</option>`;
+
+    if (snapshot.empty) {
+      editEventSelect.innerHTML = `<option value="">No events found</option>`;
+      return;
+    }
+
+    snapshot.forEach(docSnap => {
+      const data = docSnap.data();
+      loadedEventsMap.set(docSnap.id, data);
+
+      const option = document.createElement("option");
+      option.value = docSnap.id;
+      option.textContent = `${data.title || docSnap.id}`;
+      editEventSelect.appendChild(option);
+    });
+  }
+
+  editEventSelect.addEventListener("change", async () => {
+    const eventId = editEventSelect.value;
+    if (!eventId) return;
+
+    const snap = await getDoc(doc(db, "events", eventId));
+    if (!snap.exists()) {
+      alert("Event not found.");
+      return;
+    }
+
+    const data = snap.data();
+
+    document.getElementById("editEventTitle").value = data.title || "";
+    document.getElementById("editEventVenue").value = data.venue || "";
+    document.getElementById("editEventPrice").value = data.price ?? "";
+    document.getElementById("editEventImageUrl").value = data.imageUrl || "";
+    document.getElementById("editEventDescription").value = data.description || "";
+    document.getElementById("editEventDuration").value = data.duration ?? "";
+    document.getElementById("editEventAgeRating").value = data.ageRating || "";
+
+    editDatesContainer.innerHTML = "";
+
+    (data.showtimes || []).forEach(st => {
+      const dateGroup = createDateGroupHTML("edit", st.date || "");
+      const timesDiv = dateGroup.querySelector(".editTimesContainer");
+      timesDiv.appendChild(createTimeGroupHTML("edit", st.start || "", st.end || ""));
+      editDatesContainer.appendChild(dateGroup);
+    });
+
+    editPreview.innerHTML = "";
+  });
+
+  document.getElementById("editEventForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const selectedId = editEventSelect.value;
+    if (!selectedId) {
+      alert("⚠️ Please select an event to edit.");
+      return;
+    }
+
+    const title = document.getElementById("editEventTitle").value.trim();
+    const venue = document.getElementById("editEventVenue").value.trim();
+    const price = parseFloat(document.getElementById("editEventPrice").value.trim());
+    const imageUrl = document.getElementById("editEventImageUrl").value.trim();
+    const description = document.getElementById("editEventDescription").value.trim();
+    const durationVal = document.getElementById("editEventDuration").value.trim();
+    const ageRatingVal = document.getElementById("editEventAgeRating").value.trim();
+    const showtimes = collectShowtimes("edit", "editDatesContainer");
+
+    if (!showtimes.length) {
+      alert("⚠️ Please add at least one date and showtime.");
+      return;
+    }
+
+    if (!description) {
+      alert("⚠️ Please add a description.");
+      return;
+    }
+
+    // Keep same eventId so links and reservations remain tied to the same doc
+    await setDoc(doc(db, "events", selectedId), {
+      title,
+      venue,
+      price,
+      imageUrl,
+      description,
+      duration: durationVal ? Number(durationVal) : null,
+      ageRating: ageRatingVal ? ageRatingVal : null,
+      showtimes
+    });
+
+    await ensureSeatMaps(selectedId, showtimes);
+
+    editPreview.innerHTML = `
+      <p>✅ Event Updated: ${escapeHtml(title)}</p>
+      <p>Total Showtimes: ${showtimes.length}</p>
+      <p><strong>Description:</strong> ${escapeHtml(description).slice(0, 200)}${description.length > 200 ? "..." : ""}</p>
+      ${imageUrl ? `<img src="${imageUrl}" alt="Poster">` : ""}
+      <p style="margin-top:10px;">
+        <a href="Play.html?event=${encodeURIComponent(selectedId)}">➡️ Open in Play.html</a>
+      </p>
+    `;
+
+    alert("✅ Event successfully updated!");
+    await refreshAllEventViews();
+  });
+
+  // ===== RECENT SHOWS =====
+  const recentEventsContainer = document.getElementById("recentEventsContainer");
+
+  async function loadRecentShows() {
+    recentEventsContainer.innerHTML = `<div class="empty-state">Loading events...</div>`;
+
+    const snapshot = await getDocs(collection(db, "events"));
+
+    if (snapshot.empty) {
+      recentEventsContainer.innerHTML = `<div class="empty-state">No events found.</div>`;
+      return;
+    }
+
+    recentEventsContainer.innerHTML = "";
+
+    for (const docSnap of snapshot.docs) {
+      const data = docSnap.data();
+      const eventId = docSnap.id;
+      const showtimes = data.showtimes || [];
+
+      let totalSeats = 0;
+      let totalTaken = 0;
+      let totalProfit = 0;
+
+      let rows = "";
+
+      for (let i = 0; i < showtimes.length; i++) {
+        const st = showtimes[i];
+        const showKey = `${eventId}_show${i + 1}`;
+        const seatsSnap = await getDocs(collection(db, "shows", showKey, "seats"));
+
+        let seats = 0;
+        let taken = 0;
+
+        seatsSnap.forEach(seatDoc => {
+          seats++;
+          if (seatDoc.data().taken) taken++;
+        });
+
+        const seatsLeft = seats - taken;
+        const profit = taken * (data.price || 0);
+        const statusText = seatsLeft <= 0 ? "Sold Out" : `${seatsLeft} Left`;
+
+        totalSeats += seats;
+        totalTaken += taken;
+        totalProfit += profit;
+
+        rows += `
+          <tr>
+            <td>${formatDate(st.date)} — ${formatTime(st.start)}–${formatTime(st.end)}</td>
+            <td>${seats}</td>
+            <td>${taken}</td>
+            <td>${seatsLeft}</td>
+            <td>₱${profit}</td>
+            <td class="${seatsLeft <= 0 ? 'sold-out' : 'seats-left'}">${statusText}</td>
+          </tr>
+        `;
+      }
+
+      const card = document.createElement("div");
+      card.className = "event-card";
+      card.innerHTML = `
+        <div class="event-card-top">
+          <div>
+            <div class="event-title">${escapeHtml(data.title || "Untitled")}</div>
+            <div class="event-venue">${escapeHtml(data.venue || "No venue")}</div>
+          </div>
+
+          <button class="archive-btn" data-id="${eventId}" title="Archive Event">🗂 Archive</button>
+        </div>
+
+        <div class="event-meta">
+          <div><strong>Price:</strong> ₱${data.price || 0}</div>
+          <div><strong>Duration:</strong> ${data.duration ? `${data.duration} minutes` : "—"}</div>
+          <div><strong>Age Rating:</strong> ${escapeHtml(data.ageRating || "—")}</div>
+          <div><strong>Total Seats:</strong> ${totalSeats}</div>
+          <div><strong>Taken:</strong> ${totalTaken}</div>
+          <div><strong>Seats Left:</strong> ${totalSeats - totalTaken}</div>
+          <div><strong>Profit:</strong> ₱${totalProfit}</div>
+        </div>
+
+        <div class="event-description">${escapeHtml(data.description || "No description.")}</div>
+
+        ${data.imageUrl ? `<img class="event-poster" src="${data.imageUrl}" alt="Poster">` : ""}
+
+        <div class="showtime-table-wrap">
+          <table class="showtime-table">
+            <thead>
+              <tr>
+                <th>Showtime</th>
+                <th>Total Seats</th>
+                <th>Taken</th>
+                <th>Seats Left</th>
+                <th>Profit</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rows || `<tr><td colspan="6">No showtimes available.</td></tr>`}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      recentEventsContainer.appendChild(card);
+    }
+
+    document.querySelectorAll(".archive-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const eventId = btn.getAttribute("data-id");
+        if (eventId) await archiveEvent(eventId);
+      });
+    });
+  }
+
+  // ===== ARCHIVE LOGIC =====
+  async function archiveEvent(eventId) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("⚠️ You must be logged in.");
+    return;
+  }
+
+ function getPasswordFromModal() {
+  return new Promise((resolve) => {
+    const modal = document.getElementById("passwordModal");
+    const input = document.getElementById("passwordInput");
+    const confirmBtn = document.getElementById("confirmPasswordBtn");
+    const cancelBtn = document.getElementById("cancelPasswordBtn");
+
+    modal.classList.remove("hidden");
+    input.value = "";
+    input.focus();
+
+    function cleanup() {
+      modal.classList.add("hidden");
+      confirmBtn.removeEventListener("click", onConfirm);
+      cancelBtn.removeEventListener("click", onCancel);
+    }
+
+    function onConfirm() {
+      const value = input.value;
+      cleanup();
+      resolve(value);
+    }
+
+    function onCancel() {
+      cleanup();
+      resolve(null);
+    }
+
+    confirmBtn.addEventListener("click", onConfirm);
+    cancelBtn.addEventListener("click", onCancel);
+  });
+}
+
+  const password = await getPasswordFromModal();
+
+  if (!password) {
+    alert("❌ Archive cancelled.");
+    return;
+  }
+
+  try {
+    // 🔐 Re-authenticate
+    const credential = EmailAuthProvider.credential(user.email, password);
+    await reauthenticateWithCredential(user, credential);
+
+    // Confirm AFTER correct password
+    if (!confirm("⚠️ Are you sure you want to archive this event?")) return;
+
+    try {
+      const eventRef = doc(db, "events", eventId);
+      const eventSnap = await getDoc(eventRef);
+
+      if (!eventSnap.exists()) {
+        alert("❌ Event not found.");
+        return;
+      }
+
+      const eventData = eventSnap.data();
+      const showtimes = eventData.showtimes || [];
+
+      let totalSeats = 0;
+      let takenSeats = 0;
+
+      const showPromises = showtimes.map(async (_, i) => {
+  const showKey = `${eventId}_show${i + 1}`;
+
+  const showRef = doc(db, "shows", showKey);
+  const seatsCol = collection(db, "shows", showKey, "seats");
+
+  const [showSnap, seatsSnap] = await Promise.all([
+    getDoc(showRef),
+    getDocs(seatsCol)
+  ]);
+
+const results = await Promise.all(showPromises);
+
+let totalSeats = 0;
+let takenSeats = 0;
+
+results.forEach(r => {
+  totalSeats += r.localSeats;
+  takenSeats += r.localTaken;
+});
+
+  // copy seats in parallel
+  const copyPromises = seatsSnap.docs.map(sd => {
+    const seatData = sd.data();
+    localSeats++;
+    if (seatData.taken) localTaken++;
+
+    return setDoc(
+      doc(db, "history", eventId, "shows", showKey, "seats", sd.id),
+      seatData
+    );
+  });
+
+  await Promise.all(copyPromises);
+
+  // delete seats in parallel
+  await Promise.all(seatsSnap.docs.map(sd => deleteDoc(sd.ref)));
+
+  if (showSnap.exists()) {
+    await setDoc(doc(db, "history", eventId, "shows", showKey), showSnap.data());
+    await deleteDoc(showRef);
+  }
+
+  return { localSeats, localTaken };
+});
+
+
+
+      const profit = takenSeats * (eventData.price || 0);
+
+      await setDoc(doc(db, "history", eventId), {
+        ...eventData,
+        originalEventId: eventId,
+        totalSeats,
+        takenSeats,
+        profit,
+        deletedAt: serverTimestamp(),
+        deletedBy: user.uid,
+        deletedByEmail: user.email
+      });
+
+      await deleteDoc(eventRef);
+
+      alert(`✅ Event archived (Seats: ${takenSeats}/${totalSeats}, Profit: ₱${profit})`);
+      await refreshAllEventViews();
+
+    } catch (err) {
+      console.error("archiveEvent ERROR", err);
+      alert("⚠️ Archive failed: " + err.message);
+    }
+
+  } catch (authError) {
+    console.error("Reauth ERROR", authError);
+    alert("❌ Incorrect password or session expired.");
+  }
+}
+  
+</script>
+
+</body>
+</html>

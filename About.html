@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About Us | TEATRO Lasalliana</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Poppins',sans-serif;
+background:#d9d9d9;
+color:#111;
+}
+
+h1,h2,h3{
+font-family:'Playfair Display',serif;
+}
+
+a{
+text-decoration:none;
+color:inherit;
+}
+
+/* NAVBAR */
+
+.navbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 60px;
+background:#eaeaea;
+border-bottom:1px solid rgba(0,0,0,0.1);
+}
+
+.logo-wrap img{
+width:45px;
+}
+
+.nav-links{
+display:flex;
+gap:28px;
+font-size:13px;
+font-weight:600;
+}
+
+.nav-links a:hover{
+text-decoration:underline;
+}
+
+/* HERO */
+
+.hero{
+height:65vh;
+background:url("https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=2000&q=60") center/cover no-repeat;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+color:white;
+position:relative;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.45);
+}
+
+.hero-content{
+position:relative;
+z-index:1;
+max-width:800px;
+}
+
+.hero h1{
+font-size:60px;
+margin-bottom:25px;
+}
+
+/* ABOUT TEXT */
+
+.about{
+background:#2f3333;
+color:white;
+padding:60px 80px;
+line-height:1.8;
+font-size:15px;
+text-align:justify;
+}
+
+.about p{
+margin-bottom:18px;
+max-width:900px;
+}
+
+/* FOOTER */
+
+footer{
+background:#111;
+color:white;
+padding:20px 60px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+}
+
+footer h3{
+font-weight:400;
+}
+
+.socials{
+display:flex;
+gap:20px;
+font-size:22px;
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+.navbar{
+padding:15px 20px;
+}
+
+.hero h1{
+font-size:40px;
+}
+
+.about{
+padding:40px 20px;
+}
+
+footer{
+padding:20px;
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+<div class="logo-wrap">
+<a href="index.html">
+<img src="Teatro logo.png">
+</a>
+</div>
+
+<div class="nav-links">
+<a href="index.html">HOME</a>
+<a href="index.html#eventsSection">PREMIERES</a>
+<a href="Teatro.html">TEATRO</a>
+<a href="About.html">ABOUT US</a>
+</div>
+
+</div>
+
+<!-- HERO -->
+
+<div class="hero">
+
+<div class="hero-content">
+
+<h1>TEATRO Lasalliana</h1>
+
+<p>
+TEATRO Lasalliana (TLS) is one of the seven Performing Arts Groups (PAGs) under the supervision of the Cultural Arts Office and serves as the institutionally recognized premier theatre organization on campus.
+</p>
+
+<p>
+TLS champions theatre as a collaborative and transformative art form, consistently producing individuals shaped by brilliance, discipline, and passion—not only for the stage but also for their chosen vocations.
+</p>
+
+<p>
+For over three decades, TLS has continued to grow and inspire, spreading awareness of life and society under its enduring motto: <strong>“Go for Truth.”</strong>
+</p>
+
+</div>
+
+</div>
+
+<!-- FOOTER -->
+
+<footer>
+
+<h3>TEATRO Lasalliana</h3>
+
+<div class="socials">
+<span>◎</span>
+<span>f</span>
+</div>
+
+</footer>
+
+</body>
+</html>

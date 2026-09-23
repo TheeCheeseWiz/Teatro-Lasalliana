@@ -1,0 +1,109 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own document
+      allow read: if isOwner(userId);
+      // Only the user can create their own document during signup
+      allow create: if isOwner(userId) && 
+                      request.resource.data.role == 'user' &&
+                      request.resource.data.email == request.auth.token.email;
+      // Users can update their own document (except role)
+      allow update: if isOwner(userId) && 
+                      request.resource.data.role == resource.data.role;
+      // Only admins can delete user documents
+      allow delete: if isAdmin();
+    }
+    
+    // Events collection
+    match /events/{eventId} {
+      // Anyone can read events
+      allow read: if true;
+      // Only admins can create, update, or delete events
+      allow create, update, delete: if isAdmin();
+    }
+    
+    // Shows collection (seat data)
+    match /shows/{showKey}/seats/{seatId} {
+      // Anyone can read seat availability
+      allow read: if true;
+      
+      // Users can update seats for reservation and payment
+      // Prevent users from taking already paid seats
+      allow update: if isAuthenticated() && 
+                      (
+                        // Reserving a seat
+                        (request.resource.data.reservationStatus == 'reserved' &&
+                         request.resource.data.reservedBy == request.auth.uid &&
+                         (!resource.data.taken || resource.data.reservedBy == request.auth.uid)) ||
+                        
+                        // Paying for a reserved seat
+                        (request.resource.data.reservationStatus == 'paid' &&
+                         resource.data.reservedBy == request.auth.uid)
+                      );
+      
+      // Only admins can create or delete seats
+      allow create, delete: if isAdmin();
+    }
+    
+    // Transactions collection
+    match /transactions/{transactionId} {
+      // Users can read their own transactions, admins can read all
+      allow read: if isAuthenticated() && 
+                    (resource.data.userId == request.auth.uid || isAdmin());
+      
+      // Transactions are created automatically during reservations/payments
+      allow create: if isAuthenticated() && 
+                      request.resource.data.userId == request.auth.uid;
+      
+      // No updates or deletes allowed (immutable audit log)
+      allow update, delete: if false;
+    }
+    
+    // Orders collection
+    match /orders/{orderId} {
+      // Users can read their own orders, admins can read all
+      allow read: if isAuthenticated() && 
+                    (resource.data.userId == request.auth.uid || isAdmin());
+      
+      // Orders are created during payment
+      allow create: if isAuthenticated() && 
+                      request.resource.data.userId == request.auth.uid;
+      
+      // No updates or deletes allowed
+      allow update, delete: if false;
+    }
+    
+    // History collection (archived events)
+    match /history/{eventId} {
+      // Anyone can read archived events
+      allow read: if true;
+      
+      // Only admins can create/update/delete in history
+      allow write: if isAdmin();
+      
+      // Nested shows in history
+      match /shows/{showKey}/seats/{seatId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+  }
+}
