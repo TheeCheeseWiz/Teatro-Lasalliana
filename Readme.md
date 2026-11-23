@@ -1,65 +1,74 @@
-# Teatro Lasalliana
+# 🎭 Teatro Lasalliana — Web-Based Ticket Reservation & Event Management System
 
-Teatro Lasalliana is a web-based theater reservation and event management system developed as a **group capstone project**.
+A web-based theater event browsing, interactive seat reservation, payment, and administrative management system developed collaboratively as a **group capstone project**.
 
-The system allows users to browse theater events, view event information, reserve seats, manage reservations, and handle transactions. It also provides administrative features for managing events and theater-related records.
+---
 
-## Features
+## 🎯 Overview
+**Teatro Lasalliana** enables patrons to browse theater productions, inspect showtimes and seat availability, reserve seats, complete payments, view reservation history, and receive booking confirmations—while giving administrators tools to create, update, and remove events, oversee reservations, and inspect transaction records.
+
+---
+
+## ✨ Key Features
 
 ### User Features
-
-* User registration and login
-* Browse theater events
-* View event information
-* Seat selection and reservation
-* Reservation history
-* Reservation management
-* Payment functionality
-* Transaction records
+- User registration and login
+- Browse theater events and view event details
+- Interactive seat selection and reservation
+- Reservation history and reservation management
+- Payment processing and transaction records
 
 ### Admin Features
+- Admin authentication
+- Create, manage, and delete theater events
+- Manage reservations and view transactions
 
-* Admin authentication
-* Create theater events
-* Manage existing events
-* Delete events
-* Manage reservations
-* View transactions
+---
 
-## Technologies Used
+## 🛠️ Technologies Used
+- **Frontend:** HTML5, CSS3, JavaScript
+- **Backend & Cloud:** Firebase Authentication, Cloud Firestore, Firebase Security Rules, Cloudflare Workers
+- **Payments & Notifications:** PayMongo, EmailJS
 
-* HTML5
-* CSS3
-* JavaScript
-* Firebase Authentication
-* Cloud Firestore
-* Firebase Security Rules
-* EmailJS
-* PayMongo
-* Cloudflare Workers
+---
 
-## My Contribution
+## 📸 System Walkthrough
 
-Teatro Lasalliana was developed collaboratively as a group capstone project.
+### 1. Interactive Seat & Showtime Selection
+Patrons select a showtime schedule and choose seats directly on the theater seat map (`Available`, `Selected`, and `Occupied` states) with live seat count and total calculation.
+<img width="1280" height="610" alt="assets-01-seat-showtime-selection" src="https://github.com/user-attachments/assets/dc81f56b-9f45-49c3-afa8-30940695305e" />
 
-My primary contribution focused on the **backend and technical implementation** of the system, including:
 
-* Firebase Authentication integration
-* Cloud Firestore integration
-* Firestore security rules
-* Reservation and transaction functionality
-* Payment integration
-* Email service integration
-* JavaScript functionality
-* Backend-related testing and troubleshooting
+### 2. Payment Checkout (PayMongo Integration)
+Generates reservation payment summaries and QR Ph / digital wallet checkout options integrated through a worker/server-side endpoint.
+<img width="1280" height="612" alt="assets-02-paymongo-qrph-checkout" src="https://github.com/user-attachments/assets/6c1f9710-d90c-41cc-8f0d-1a0a2d98754b" />
 
-The **UI/UX design and visual interface were developed by my group members collaboratively**.
+### 3. Automated Booking Confirmation (EmailJS)
+Sends structured reservation confirmation emails with event details, venue, schedule, seat assignments, and total amount.
+<img width="674" height="734" alt="assets-03-emailjs-reservation-confirmation" src="https://github.com/user-attachments/assets/2edc3933-7dcc-425f-8835-253a5677d4a6" />
 
-## Project Structure
+### 4. Cloud Firestore Collections & Transaction Records
+Organizes application data across collections (`events`, `shows`, `reservations`, `orders`, `transactions`, `history`, `users`, `deleted_events`) with structured transaction and seat metadata.
+<img width="991" height="525" alt="assets-04-firestore-transactions-schema" src="https://github.com/user-attachments/assets/1214753b-1d0c-45b3-948f-2fa0a7b08d67" />
 
-```
+
+## 🤝 My Contribution
+Developed collaboratively as a group capstone project. My primary focus was on the **backend and technical implementation**, including:
+
+- Firebase Authentication and Cloud Firestore integration
+- Firestore security rules (`firestore.rules`)
+- Reservation, payment, and transaction workflows
+- PayMongo worker/server-side payment integration and EmailJS notification integration
+- Core JavaScript logic, testing, and troubleshooting
+
+*(UI/UX design and visual interface styling were developed collaboratively with my group members.)*
+
+---
+
+## 📁 Project Structure
+
+```text
 Teatro-Lasalliana/
-│
 ├── LICENSE
 ├── README.md
 ├── index.html
@@ -67,8 +76,7 @@ Teatro-Lasalliana/
 ├── Admin.html
 ├── Create.html
 ├── Delete.html
-├── History.html
-├── Login.html
+├── History.html<img width="1280" height="610" alt="assets-01-seat-showtime-selection" src="https://github.com/user-attachments/assets/8e305899-9f2d-4d7e-a60b-fc1fb495309e" />
 ├── ManageEvents.html
 ├── Payment.html
 ├── Play.html
@@ -76,64 +84,12 @@ Teatro-Lasalliana/
 ├── Teatro.html
 ├── Transaction.html
 ├── Run.bat
-│
 ├── FB logo.png
 ├── Insta logo.jpg
 ├── Teatro logo.png
-│
 ├── firestore.rules
-│
 └── js/
     ├── alerts.js
     ├── constants.js
     ├── firebase-config.js
     └── utils.js
-```
-
-## Running the Project
-
-### Using the Included Batch File
-
-On Windows, the project includes:
-
-```
-Run.bat
-```
-
-which can be used to start the project locally.
-
-### Manual Setup
-
-The project should be served through a local web server rather than opened directly using `file://`, particularly because the application uses JavaScript modules and Firebase services.
-
-## Firebase
-
-The application uses **Firebase Authentication** and **Cloud Firestore**.
-
-The Firestore security rules are included in:
-
-```
-firestore.rules
-```
-
-The rules file must be deployed to the Firebase project separately. Simply uploading the file to GitHub does not change the rules deployed in Firebase.
-
-## Payment
-
-The project includes **PayMongo** payment functionality through a worker/server-side endpoint.
-
-Private payment credentials and secret keys should not be stored in the frontend source code or committed to GitHub.
-
-## Email
-
-The application uses **EmailJS** for email-related functionality.
-
-Client-side public identifiers required by EmailJS may be included in the application. Private credentials should not be committed to the repository.
-
-## Project Status
-
-This project was developed as an **academic group capstone project** and demonstrates the implementation of a theater reservation and event management system using web technologies and cloud-based services.
-
-## License
-
-This project includes a `LICENSE` file containing the applicable licensing terms.
